@@ -1,0 +1,26 @@
+{
+  "name": "gulp",
+  "version": "1.0.0",
+  "description": "Gulp for Last Mile",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saincogt/PRT820Game.git"
+  },
+  "keywords": [
+    "JavaScript",
+    "Game",
+    "Humanitarian",
+    "Logistics",
+    "HTML5"
+  ],
+  "author": "Sancho",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saincogt/PRT820Game/issues"
+  },
+  "homepage": "https://github.com/saincogt/PRT820Game#readme"
+}
