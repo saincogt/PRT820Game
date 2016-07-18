@@ -19,6 +19,7 @@ gulp.task('default', function () {
 	return gutil.log("Gulp is running!");
 	});
 
+// Watch task, watch if something was changed
 gulp.task('watch', function() {
 	gulp.watch('js/*.js', ['jshint']);
 });
