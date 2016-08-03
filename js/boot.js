@@ -4,13 +4,15 @@ var bootState = function (game) {
 
 bootState.prototype = {
 	preload: function () {
-		var startScreenLabel = game.add.text(300, 40, 'Last Mile', {font: '50px Times New Roman', fill: '#000'});
-		var loadingLabel = game.add.text(300, 260, 'Loading...', {font: '30px Courier', fill: '#000'});
-		this.game.load.image('play', 'assets/img/play.png');
+		
+		this.load.image('play', 'assets/img/play.png');
+		this.load.image('background', 'assets/img/menu-background.png');
 	},
 	create: function () {
 		// var playImg = this.game.add.image(this.world.width/2, this.world.height/2, 'play');
-		this.stage.backgroundColor = "#FF0";
+		var background = this.game.add.image(0, 0, 'background');
+		var startScreenLabel = game.add.text(300, 40, 'Last Mile', {font: '50px Times New Roman', fill: '#000'});
+		var loadingLabel = game.add.text(300, 260, 'Loading...', {font: '30px Courier', fill: '#000'});
 		this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 		this.scale.pageAlignHorizontally = true;
 
