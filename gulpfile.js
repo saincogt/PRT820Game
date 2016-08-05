@@ -18,6 +18,11 @@ gulp.task('jshint', function () {
 		.pipe(jshint.reporter('jshint-stylish'));
 	});
 
+gulp.task('deps', function() {
+	return gulp.src('node_modules/phaser/build/phaser.min.js')
+		.pipe(gulp.dest('build.js'));
+});
+
 gulp.task('default', function () {
 	// default tasks
 

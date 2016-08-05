@@ -5,7 +5,8 @@
   "main": "gulpfile.js",
   "dependencies": {
     "gulp-jshint": "^2.0.1",
-    "gulp-jslint": "^1.0.1"
+    "gulp-jslint": "^1.0.1",
+    "phaser": "^2.6.1"
   },
   "devDependencies": {
     "gulp": "^3.9.1",

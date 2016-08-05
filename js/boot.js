@@ -6,7 +6,7 @@ bootState.prototype = {
 	preload: function () {
 		
 		this.load.image('background', 'assets/img/background.jpg');
-		this.load.image('title', 'assets/img/title.png');
+		this.load.image('title', 'assets/img/title1.png');
 		this.load.image('play', 'assets/img/playMenu.png');
 		this.load.image('score', 'assets/img/scoreMenu.png');
 	},
@@ -14,8 +14,18 @@ bootState.prototype = {
 
 		var background = this.game.add.image(0, 0, 'background');
 
-		var title = game.add.image(this.world.centerX, this.world.centerY/2, 'title');
+		var title = game.add.sprite(this.world.centerX, this.world.centerY/2, 'title');
 		title.anchor.setTo(0.5, 0.5);
+
+		// Tried to add tween to the title
+		// this.titleGroup = this.game.add.group();
+		// this.titleGroup.add(this.title);
+
+		// this.titleGroup.x = 10;
+		// this.titleGroup.y = 100;
+		// this.title.x = 10;
+		// this.title.y = 10;
+		// this.game.add.tween(this.title).to({y:this.world.centerY/2}, 350, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
 
 		// var loadingLabel = game.add.text(300, 260, 'Loading...', {font: '30px Courier', fill: '#000'});
 		
