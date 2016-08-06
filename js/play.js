@@ -12,22 +12,23 @@ playState.prototype = {
 		this.load.image('porter', 'assets/img/porter.png');
 		this.load.image('shelter', 'assets/img/shelter.png');
 		this.load.image('warehouse', 'assets/img/warehouse-1.png');
-		this.load.image('poplulation', 'assets/img/population.png');
-		this.load.image('score', 'assets/img/scoreBoard.png');
+		// this.load.image('poplulation', 'assets/img/population.png');
+		// this.load.image('score', 'assets/img/scoreBoard.png');
 		this.load.image('back', 'assets/img/backArrow.png');
 		this.load.image('pause', 'assets/img/pause.png');
 		this.load.image('waterBox', 'assets/img/waterBox.png');
 		this.load.image('foodBox', 'assets/img/foodBox.png');
 		this.load.image('medicineBox', 'assets/img/medicineBox.png');
 		this.load.image('shelterBox', 'assets/img/shelterBox.png');
+		this.load.bitmapFont('lastmileFont', 'assets/img/font.png', 'assets/img/font.fnt');
 	},
 	create: function () {
 		this.stage.backgroundColor = "#FFF";
 		this.add.image(0, 0, 'background');
 		var warehouse = this.add.image(this.world.width*7/8, this.world.centerY, 'warehouse');
 		var camp = this.add.image(this.world.width/8, this.world.centerY, 'camp');
-		var population = this.add.image(this.world.width/20, this.world.height/20, 'poplulation');
-		var score = this.add.image(this.world.width*15/20, this.world.height/20, 'score');
+		// var population = this.add.image(this.world.width/20, this.world.height/20, 'poplulation');
+		// var score = this.add.image(this.world.width*15/20, this.world.height/20, 'score');
 
 		var backArrow = this.add.button(this.world.width*1.5/20, this.world.height*18/20, 'back', this.goBack, this);
 		backArrow.scale.setTo(0.05, 0.05);
@@ -65,6 +66,12 @@ playState.prototype = {
 		shelterBox.scale.setTo(0.6, 0.6);
 		shelterBox.inputEnabled = true;
 		shelterBox.input.enableDrag();
+
+		var population = 1000;
+		var scores = 50000;
+
+		var populationText = this.add.bitmapText(this.world.width/20, this.world.height/20,'lastmileFont', 'Population: ' + population, 20);
+		var scoreText = this.add.bitmapText(this.world.width*15/20, this.world.height/20, 'lastmileFont', 'Scores: ' + scores, 20);
 	},
 	goBack: function () {
 		this.game.state.start('boot');

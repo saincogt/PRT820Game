@@ -9,6 +9,7 @@ bootState.prototype = {
 		this.load.image('title', 'assets/img/title1.png');
 		this.load.image('play', 'assets/img/playMenu.png');
 		this.load.image('score', 'assets/img/scoreMenu.png');
+		this.load.bitmapFont('lastmileFont', 'assets/img/font.png', 'assets/img/font.fnt');
 	},
 	create: function () {
 
@@ -37,6 +38,8 @@ bootState.prototype = {
 		var scoreButton = this.game.add.button(this.world.centerX, 360, 'score', this.checkScore, this);
 		scoreButton.scale.setTo(0.8, 0.8);
 		scoreButton.anchor.setTo(0.5, 0.5);
+		var authorText = this.add.bitmapText(this.world.centerX, 450, 'lastmileFont', 'Developer: Sancho', 30);
+		authorText.anchor.setTo(0.5, 0.5);
 
 		this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 		this.scale.pageAlignHorizontally = true;
