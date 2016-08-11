@@ -52,9 +52,9 @@ playState.prototype = {
 		this.transports = new Transports(this.game);
 		this.game.add.existing(this.transports);
 
-		this.flyThePlane = this.add.button(this.world.width*7/8-180, this.world.centerY, 'goButton', this.flyThePlane, this);
-		this.flyThePlane.scale.setTo(0.5, 0.5);
-		this.flyThePlane.anchor.setTo(0.5, 0.5);
+		this.goButton = this.add.button(this.world.width*7/8-180, this.world.centerY, 'goButton', this.flyThePlane, this);
+		this.goButton.scale.setTo(0.5, 0.5);
+		this.goButton.anchor.setTo(0.5, 0.5);
 
 		this.killALife = this.add.button(this.world.width*7/8-180, this.world.centerY-100, 'goButton', this.failedToSatisfy, this);
 		this.killALife.scale.setTo(0.5, 0.5);
@@ -116,8 +116,7 @@ playState.prototype = {
 	// Click the button and start the delivery
 	flyThePlane: function () {
 		this.transports.showOptions();
-		this.flyThePlane.kill();
-		this.camp.consume();
+		// this.flyThePlane.kill();
 	},
 
 	checkLife: function () {
@@ -135,6 +134,7 @@ playState.prototype = {
 		if (lives.countLiving() < 1) {
 			var gameOver = this.add.bitmapText(this.world.width/2, this.world.height/2,'lastmileFont', 'Game Over!', 20);
 			gameOver.anchor.setTo(0.5, 0.5);
+			// this.killALife.kill();
 		};
 	}
 };
