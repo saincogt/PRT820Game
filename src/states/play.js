@@ -10,6 +10,8 @@ var Items = require('../obj/items');
 var Transports = require('../obj/transports');
 
 var lives;
+var populationText;
+var scoreText;
 
 
 playState.prototype = {
@@ -72,8 +74,8 @@ playState.prototype = {
 
 		this.scores = 50000;
 
-		this.populationText = this.add.bitmapText(this.world.width/20, this.world.height/20,'lastmileFont', 'Population: ' + this.camp.population, 20);
-		this.scoreText = this.add.bitmapText(this.world.width*15/20, this.world.height/20, 'lastmileFont', 'Scores: ' + this.scores, 20);
+		populationText = this.add.bitmapText(this.world.width/20, this.world.height/20,'lastmileFont', 'Population: ' + this.camp.population, 20);
+		scoreText = this.add.bitmapText(this.world.width*15/20, this.world.height/20, 'lastmileFont', 'Scores: ' + this.scores, 20);
 		
 		// this.camp.expandStorage();
 		this.camp.showStock();
@@ -87,12 +89,14 @@ playState.prototype = {
 			playerLife.anchor.setTo(0.5, 0.5);
 			playerLife.scale.setTo(0.1, 0.1);
 			playerLife.alpha = 1;
-		}
+		};
+
+		// Time events: run the addPopulation function in every 1 minute;
+		this.time.events.loop(Phaser.Timer.SECOND * 3, this.addPopulation, this);
 
 		// console.log(this);
 		// this.time = new Time(this);
 		// this.oldTime = time.now;
-		
 	},
 
 	// Back to Menu state
@@ -132,10 +136,20 @@ playState.prototype = {
 
 		// If the player have less than 1 life, then game will be over;
 		if (lives.countLiving() < 1) {
-			var gameOver = this.add.bitmapText(this.world.width/2, this.world.height/2,'lastmileFont', 'Game Over!', 20);
+			var gameOver = this.add.bitmapText(this.world.width/2, this.world.height/2,'lastmileFont', 'Game Over!\n Your Score:' + this.scores, 20);
 			gameOver.anchor.setTo(0.5, 0.5);
 			// this.killALife.kill();
 		};
+	},
+
+	addPopulation: function () {
+		this.camp.population += 1000;
+		// this.add.tween(this.scoreText).to({alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
+		populationText.setText('Population: ' + this.camp.population);
+	},
+
+	render: function () {
+		this.game.debug.body(this.transports.plane);
 	}
 };
 

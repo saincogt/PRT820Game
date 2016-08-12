@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var menuState = require('./states/menu');
 var playState = require('./states/play');
 
@@ -126,19 +126,19 @@ module.exports = Items;
 var Transports = function (game, x, y, frame) {
 	Phaser.Sprite.call(this, game, x, y, frame);
 
-	var truck = game.add.sprite(game.world.width*7/8-180, game.world.centerY+100, 'truck');
-	truck.scale.setTo(0.07, 0.07);
-	truck.anchor.setTo(0.5, 0.5);
+	this.truck = game.add.sprite(game.world.width*7/8-180, game.world.centerY+100, 'truck');
+	this.truck.scale.setTo(0.06, 0.06);
+	this.truck.anchor.setTo(0.5, 0.5);
 
 
-	var plane = game.add.sprite(game.world.width*7/8-180, game.world.centerY+50, 'plane');
-	plane.scale.setTo(0.1, 0.1);
-	plane.anchor.setTo(0.5, 0.5);
+	this.plane = game.add.sprite(game.world.width*7/8-180, game.world.centerY+50, 'plane');
+	this.plane.scale.setTo(0.07, 0.07);
+	this.plane.anchor.setTo(0.5, 0.5);
 
 	this.showOptions = function () {
-		var tween = game.add.tween(truck);
+		var tween = game.add.tween(this.truck);
 		tween.to({x: game.world.width/8}, 20000, 'Linear', true, 0);
-		game.add.tween(plane).to({x: [game.world.width/2, game.world.width/8], y: [game.world.centerY-50, game.world.centerY+70]}, 5000, Phaser.Easing.Quadratic.InOut, true, 0);
+		game.add.tween(this.plane).to({x: [game.world.width/2, game.world.width/8], y: [game.world.centerY-50, game.world.centerY+70]}, 5000, Phaser.Easing.Quadratic.InOut, true, 0);
 
 	};
 };
@@ -321,12 +321,13 @@ playState.prototype = {
 			playerLife.anchor.setTo(0.5, 0.5);
 			playerLife.scale.setTo(0.1, 0.1);
 			playerLife.alpha = 1;
-		}
+		};
 
 		// console.log(this);
 		// this.time = new Time(this);
 		// this.oldTime = time.now;
-		
+		console.log('Hello World!');
+		console.log('Hello Sancho!');
 	},
 
 	// Back to Menu state
@@ -366,12 +367,16 @@ playState.prototype = {
 
 		// If the player have less than 1 life, then game will be over;
 		if (lives.countLiving() < 1) {
-			var gameOver = this.add.bitmapText(this.world.width/2, this.world.height/2,'lastmileFont', 'Game Over!', 20);
+			var gameOver = this.add.bitmapText(this.world.width/2, this.world.height/2,'lastmileFont', 'Game Over!\n Your Score:' + this.scores, 20);
 			gameOver.anchor.setTo(0.5, 0.5);
 			// this.killALife.kill();
 		};
+	},
+
+	render: function () {
+		this.game.debug.body(this.transports.plane);
 	}
 };
 
 module.exports = playState;
-},{"../obj/camp":2,"../obj/items":3,"../obj/transports":4,"../obj/warehouse":5}]},{},[1]);
+},{"../obj/camp":2,"../obj/items":3,"../obj/transports":4,"../obj/warehouse":5}]},{},[1])

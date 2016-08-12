@@ -10,6 +10,8 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var imageResize = require('gulp-image-resize');
+var browserify = require('gulp-browserify');
+var source = require('vinyl-source-stream');
 
 // Lint task
 gulp.task('jshint', function () {
@@ -31,7 +33,9 @@ gulp.task('default', function () {
 
 // Watch task, watch if something was changed
 gulp.task('watch', function() {
-	gulp.watch('js/*.js', ['jshint']);
+	// gulp.watch('src/*.js', ['jshint']);
+	gulp.watch('src/*.js', ['browserify']);
+
 });
 //Users/SayNo/Google Drive/LastMile
 
@@ -45,3 +49,10 @@ gulp.task('imageResize', function () {
 		}))
 	.pipe(gulp.dest('build/assets'))
 	});
+
+gulp.task('browserify', function () {
+	gulp.src('src/main.js')
+	.pipe(browserify())
+	.pipe(gulp.dest('build/js'))
+	})
+
