@@ -12,6 +12,7 @@ var Transports = require('../obj/transports');
 var lives;
 var populationText;
 var scoreText;
+var gamePause = false;
 
 
 playState.prototype = {
@@ -21,7 +22,7 @@ playState.prototype = {
 		this.load.image('camp', 'src/assets/img/camp-1.png');
 		this.load.image('convoy', 'src/assets/img/convoy.png');
 		this.load.image('food', 'src/assets/img/food.png');
-		this.load.image('porter', 'src/assets/img/porter.png');
+		this.load.image('porter', 'src/assets/img/porter-1.png');
 		this.load.image('shelter', 'src/assets/img/shelter.png');
 		this.load.image('warehouse', 'src/assets/img/warehouse-1.png');
 		this.load.image('back', 'src/assets/img/backArrow.png');
@@ -37,6 +38,8 @@ playState.prototype = {
 		this.load.image('plane', 'src/assets/img/plane.png');
 		this.load.image('goButton', 'src/assets/img/goButton.png');
 		this.load.image('waiting', 'src/assets/img/waiting.png');
+		this.load.image('loadingzone', 'src/assets/img/loading zone.jpg');
+		this.load.image('failed', 'src/assets/img/fail.png');
 	},
 	create: function () {
 		this.add.image(0, 0, 'background');
@@ -44,8 +47,13 @@ playState.prototype = {
 		this.camp = new Camp(this.game, this.world.width/8, this.world.centerY);
 		this.game.add.existing(this.camp);
 
+
 		this.warehouse = new Warehouse(this.game, this.world.width*7/8, this.world.centerY);
 		this.game.add.existing(this.warehouse);
+
+		var loadingzone = this.game.add.image(this.world.width*7/8, this.world.centerY+150, 'loadingzone');
+		loadingzone.anchor.setTo(0.5, 0.5);
+		loadingzone.scale.setTo(0.5, 0.5);
 
 		this.items = new Items(this.game);
 		this.game.add.existing(this.items);
@@ -54,11 +62,19 @@ playState.prototype = {
 		this.transports = new Transports(this.game);
 		this.game.add.existing(this.transports);
 
-		this.goButton = this.add.button(this.world.width*7/8-180, this.world.centerY, 'goButton', this.flyThePlane, this);
-		this.goButton.scale.setTo(0.5, 0.5);
-		this.goButton.anchor.setTo(0.5, 0.5);
+		this.goPlane = this.add.button(this.world.width*7/8-180, this.world.centerY+100, 'goButton', this.sendPlane, this);
+		this.goPlane.scale.setTo(0.5, 0.5);
+		this.goPlane.anchor.setTo(0.5, 0.5);
 
-		this.killALife = this.add.button(this.world.width*7/8-180, this.world.centerY-100, 'goButton', this.failedToSatisfy, this);
+		this.goConvoy = this.add.button(this.world.width*7/8-180, this.world.centerY+160, 'goButton', this.sendConvoy, this);
+		this.goConvoy.scale.setTo(0.5, 0.5);
+		this.goConvoy.anchor.setTo(0.5, 0.5);
+
+		this.goPorters = this.add.button(this.world.width*7/8-180, this.world.centerY+220, 'goButton', this.sendPorters, this);
+		this.goPorters.scale.setTo(0.5, 0.5);
+		this.goPorters.anchor.setTo(0.5, 0.5);
+
+		this.killALife = this.add.button(this.world.width/2+ 100, 60, 'failed', this.failedToSatisfy, this);
 		this.killALife.scale.setTo(0.5, 0.5);
 		this.killALife.anchor.setTo(0.5, 0.5);
 
@@ -92,7 +108,9 @@ playState.prototype = {
 		};
 
 		// Time events: run the addPopulation function in every 1 minute;
-		this.time.events.loop(Phaser.Timer.SECOND * 3, this.addPopulation, this);
+		// For testing purpose, the time is set to 1 seconds;
+		
+		this.time.events.loop(Phaser.Timer.SECOND * 1, this.addPopulation, this);
 
 		// console.log(this);
 		// this.time = new Time(this);
@@ -105,7 +123,16 @@ playState.prototype = {
 	},
 
 	pauseGame: function () {
-		// body...
+
+		// if (!gamePause) {
+		// 	this.game.paused = true;
+		// 	gamePause = true;
+
+		// }
+		// else {
+		// 	this.game.paused = false;
+		// 	gamePause = false;
+		// }
 	},
 
 	update: function () {
@@ -118,9 +145,19 @@ playState.prototype = {
 	},
 
 	// Click the button and start the delivery
-	flyThePlane: function () {
-		this.transports.showOptions();
+	sendPlane: function () {
+		this.transports.sendPlane();
 		// this.flyThePlane.kill();
+
+		this.goPlane.inputEnabled = false;
+	},
+
+	sendConvoy: function () {
+		this.transports.sendConvoy();
+	},
+
+	sendPorters: function () {
+		this.transports.sendPorters();
 	},
 
 	checkLife: function () {
