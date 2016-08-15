@@ -20,7 +20,7 @@ menuState.prototype = {
 		var title = this.game.add.sprite(this.world.centerX, this.world.centerY/2-20, 'title');
 		title.anchor.setTo(0.5, 0.5);
 		var tween = this.add.tween(title);
-		tween.to({y: this.world.width/5+10}, 1000, Phaser.Easing.Bounce.Out, true, 800);
+		tween.to({y: this.world.width/5+25}, 800, Phaser.Easing.Bounce.Out, true, 500);
 
 		var startButton = this.game.add.button(this.world.centerX, 300, 'play', this.startPlay, this);
 		startButton.scale.setTo(0.8, 0.8);
@@ -29,7 +29,7 @@ menuState.prototype = {
 		var scoreButton = this.game.add.button(this.world.centerX, 360, 'score', this.checkScore, this);
 		scoreButton.scale.setTo(0.8, 0.8);
 		scoreButton.anchor.setTo(0.5, 0.5);
-		var authorText = this.add.bitmapText(this.world.centerX, 500, 'lastmileFont', 'Developed by Sancho', 25);
+		var authorText = this.add.bitmapText(this.world.centerX, 500, 'lastmileFont', 'Developed by Sancho', 20);
 		authorText.anchor.setTo(0.5, 0.5);
 
 		this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
