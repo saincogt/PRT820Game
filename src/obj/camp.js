@@ -26,7 +26,7 @@ var Camp = function (game, x, y, frame) {
 	// Population of the camp will be increased every minute.
 	this.addPopulation = function () {
 		this.population = this.population + 1000;
-		console.log(this.population);
+		console.log(this.water);
 	};
 
 	// Show the items in the stock of camp warehouse.

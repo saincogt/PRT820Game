@@ -34,7 +34,7 @@ gulp.task('default', function () {
 // Watch task, watch if something was changed
 gulp.task('watch', function() {
 	// gulp.watch('src/*.js', ['jshint']);
-	gulp.watch(['src/obj/*.js', 'src/states/*.js'], ['browserify']);
+	gulp.watch('src/*.js', ['browserify']);
 
 });
 //Users/SayNo/Google Drive/LastMile

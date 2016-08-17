@@ -41,7 +41,7 @@ var Camp = function (game, x, y, frame) {
 	// Population of the camp will be increased every minute.
 	this.addPopulation = function () {
 		this.population = this.population + 1000;
-		console.log(this.population);
+		console.log(this.water);
 	};
 
 	// Show the items in the stock of camp warehouse.
@@ -141,45 +141,30 @@ var Items = function (game, x, y, frame) {
 =======
 	this.showBox = function () {
 
-		var group = game.add.group();
-		group.inputEnableChildren = true;
-
-		var foodBox = group.create(game.world.width*15/20, game.world.height*5.5/20, 'foodBox');
-		foodBox.name = 'foodBox';
-
-		var waterBox = group.create(game.world.width*16/20, game.world.height*5.5/20, 'waterBox');
-		waterBox.name = 'waterBox';
-
-		var medicineBox = group.create(game.world.width*17/20, game.world.height*5.5/20, 'medicineBox');
-		medicineBox.name = 'medicineBox';
-
-		var shelterBox = group.create(game.world.width*18/20, game.world.height*5.5/20, 'shelterBox');
-		shelterBox.name = 'shelterBox';
-
-
-		// var foodBox = game.add.image(game.world.width*15/20, game.world.height*5.5/20, 'foodBox');
+		var foodBox = game.add.image(game.world.width*15/20, game.world.height*5.5/20, 'foodBox');
 		foodBox.anchor.setTo(0.5, 0.5);
 		foodBox.scale.setTo(0.4, 0.4);
-		// foodBox.inputEnabled = true;
+		foodBox.inputEnabled = true;
 		foodBox.input.enableDrag();
 
-		// var waterBox = game.add.image(game.world.width*16/20, game.world.height*5.5/20, 'waterBox');
+		var waterBox = game.add.image(game.world.width*16/20, game.world.height*5.5/20, 'waterBox');
 		waterBox.anchor.setTo(0.5, 0.5);
 		waterBox.scale.setTo(0.4, 0.4);
-		// waterBox.inputEnabled = true;
+		waterBox.inputEnabled = true;
 		waterBox.input.enableDrag();
 
-		// var medicineBox = game.add.image(game.world.width*17/20, game.world.height*5.5/20, 'medicineBox');
+		var medicineBox = game.add.image(game.world.width*17/20, game.world.height*5.5/20, 'medicineBox');
 		medicineBox.anchor.setTo(0.5, 0.5);
 		medicineBox.scale.setTo(0.4, 0.4);
-		// medicineBox.inputEnabled = true;
+		medicineBox.inputEnabled = true;
 		medicineBox.input.enableDrag();
 
-		// var shelterBox = game.add.image(game.world.width*18/20, game.world.height*5.5/20, 'shelterBox');
+		var shelterBox = game.add.image(game.world.width*18/20, game.world.height*5.5/20, 'shelterBox');
 		shelterBox.anchor.setTo(0.5, 0.5);
 		shelterBox.scale.setTo(0.4, 0.4);
-		// shelterBox.inputEnabled = true;
+		shelterBox.inputEnabled = true;
 		shelterBox.input.enableDrag();
+<<<<<<< HEAD
 
 		group.onChildInputOver.add(this.onOver, this);
 		group.onChildInputOut.add(this.onOut, this);
@@ -229,6 +214,10 @@ var Items = function (game, x, y, frame) {
 		return Phaser.Rectangle.intersects(this.boundsA, this.boundsB);
 	};
 
+=======
+	};
+
+>>>>>>> parent of 60f1345... mainly revised transports and items classes
 };
 
 Items.prototype = Object.create(Phaser.Sprite.prototype);
@@ -242,56 +231,20 @@ module.exports = Items;
 var Transports = function (game, x, y, frame) {
 	Phaser.Sprite.call(this, game, x, y, frame);
 
-	this.plane = game.add.sprite(game.world.width*7/8-90, game.world.centerY+100, 'plane');
-	this.plane.scale.setTo(0.09, 0.09);
-	this.plane.anchor.setTo(0.5, 0.5);
-	
-	// Plane can carry 2 units; 
-	// No water and shelter;
-	this.plane.storage = 2;
-	this.plane.food = 0;
-	// this.plane.water = 0;
-	this.plane.medicine = 0;
-	// this.plane.shelter = 0;
-
-	this.truck = game.add.sprite(game.world.width*7/8-90, game.world.centerY+160, 'truck');
-	this.truck.scale.setTo(0.08, 0.08);
+	this.truck = game.add.sprite(game.world.width*7/8-180, game.world.centerY+100, 'truck');
+	this.truck.scale.setTo(0.06, 0.06);
 	this.truck.anchor.setTo(0.5, 0.5);
-	
-	// Convoy can carry 5 units;
-	this.truck.storage = 5;
-	this.truck.food = 0;
-	this.truck.water = 0;
-	this.truck.medicine = 0;
-	this.truck.shelter = 0;
-	
-	this.porter = game.add.sprite(game.world.width*7/8-90, game.world.centerY+220, 'porter');
-	this.porter.scale.setTo(0.15, 0.15);
-	this.porter.anchor.setTo(0.5, 0.5);
 
-	// Porters can carry 5 units;
-	this.porter.storage = 5;
-	this.porter.food = 0;
-	this.porter.water = 0;
-	this.porter.medicine = 0;
-	this.porter.shelter = 0;
 
-	// Convoy takes 20 seconds, plane 5 seconds, porters 30 seconds to the camp;
-	this.sendPlane = function () {
-		// Tween the plane;
-		game.add.tween(this.plane).to({x: [game.world.width/2, game.world.width/8], y: [game.world.centerY-50, game.world.centerY+70]}, 5000, Phaser.Easing.Quadratic.InOut, true, 0);
+	this.plane = game.add.sprite(game.world.width*7/8-180, game.world.centerY+50, 'plane');
+	this.plane.scale.setTo(0.07, 0.07);
+	this.plane.anchor.setTo(0.5, 0.5);
 
-	};
-
-	this.sendConvoy = function () {
-		// Tween the truck;
+	this.showOptions = function () {
 		var tween = game.add.tween(this.truck);
 		tween.to({x: game.world.width/8}, 20000, 'Linear', true, 0);
-	};
+		game.add.tween(this.plane).to({x: [game.world.width/2, game.world.width/8], y: [game.world.centerY-50, game.world.centerY+70]}, 5000, Phaser.Easing.Quadratic.InOut, true, 0);
 
-	this.sendPorters = function () {
-		// Tween the porters;
-		game.add.tween(this.porter).to({x: game.world.width/8}, 30000, 'Linear', true, 0);
 	};
 <<<<<<< HEAD
 
@@ -332,7 +285,6 @@ var Transports = function (game, x, y, frame) {
 =======
 >>>>>>> parent of 88a02ed... Enabled the updates of items in camp and warehouse. When transportations arrived, add the items to the camp.
 };
-
 
 Transports.prototype = Object.create(Phaser.Sprite.prototype);
 
@@ -434,10 +386,16 @@ var Warehouse = require('../obj/warehouse');
 var Items = require('../obj/items');
 var Transports = require('../obj/transports');
 
+<<<<<<< HEAD
 var lives = 3;
 var populationText = "";
 var scoreText = "";
 var gamePause = false;
+=======
+var lives;
+var populationText;
+var scoreText;
+>>>>>>> parent of 60f1345... mainly revised transports and items classes
 
 
 playState.prototype = {
@@ -447,7 +405,7 @@ playState.prototype = {
 		this.load.image('camp', 'src/assets/img/camp-1.png');
 		this.load.image('convoy', 'src/assets/img/convoy.png');
 		this.load.image('food', 'src/assets/img/food.png');
-		this.load.image('porter', 'src/assets/img/porter-1.png');
+		this.load.image('porter', 'src/assets/img/porter.png');
 		this.load.image('shelter', 'src/assets/img/shelter.png');
 		this.load.image('warehouse', 'src/assets/img/warehouse-1.png');
 		this.load.image('back', 'src/assets/img/backArrow.png');
@@ -463,20 +421,18 @@ playState.prototype = {
 		this.load.image('plane', 'src/assets/img/plane.png');
 		this.load.image('goButton', 'src/assets/img/goButton.png');
 		this.load.image('waiting', 'src/assets/img/waiting.png');
-		this.load.image('loadingzone', 'src/assets/img/loading zone.jpg');
-		this.load.image('failed', 'src/assets/img/fail.png');
 	},
 	create: function () {
 		this.add.image(0, 0, 'background');
 
 		this.camp = new Camp(this.game, this.world.width/8, this.world.centerY);
 		this.game.add.existing(this.camp);
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of 60f1345... mainly revised transports and items classes
 		this.warehouse = new Warehouse(this.game, this.world.width*7/8, this.world.centerY);
 		this.game.add.existing(this.warehouse);
-
-		var loadingzone = this.game.add.image(this.world.width*7/8, this.world.centerY+150, 'loadingzone');
-		loadingzone.anchor.setTo(0.5, 0.5);
-		loadingzone.scale.setTo(0.5, 0.5);
 
 		this.items = new Items(this.game);
 		this.game.add.existing(this.items);
@@ -485,19 +441,11 @@ playState.prototype = {
 		this.transports = new Transports(this.game);
 		this.game.add.existing(this.transports);
 
-		this.goPlane = this.add.button(this.world.width*7/8-180, this.world.centerY+100, 'goButton', this.sendPlane, this);
-		this.goPlane.scale.setTo(0.5, 0.5);
-		this.goPlane.anchor.setTo(0.5, 0.5);
+		this.goButton = this.add.button(this.world.width*7/8-180, this.world.centerY, 'goButton', this.flyThePlane, this);
+		this.goButton.scale.setTo(0.5, 0.5);
+		this.goButton.anchor.setTo(0.5, 0.5);
 
-		this.goConvoy = this.add.button(this.world.width*7/8-180, this.world.centerY+160, 'goButton', this.sendConvoy, this);
-		this.goConvoy.scale.setTo(0.5, 0.5);
-		this.goConvoy.anchor.setTo(0.5, 0.5);
-
-		this.goPorters = this.add.button(this.world.width*7/8-180, this.world.centerY+220, 'goButton', this.sendPorters, this);
-		this.goPorters.scale.setTo(0.5, 0.5);
-		this.goPorters.anchor.setTo(0.5, 0.5);
-
-		this.killALife = this.add.button(this.world.width/2+ 100, 60, 'failed', this.failedToSatisfy, this);
+		this.killALife = this.add.button(this.world.width*7/8-180, this.world.centerY-100, 'goButton', this.failedToSatisfy, this);
 		this.killALife.scale.setTo(0.5, 0.5);
 		this.killALife.anchor.setTo(0.5, 0.5);
 
@@ -541,9 +489,7 @@ playState.prototype = {
 =======
 >>>>>>> parent of 88a02ed... Enabled the updates of items in camp and warehouse. When transportations arrived, add the items to the camp.
 		// Time events: run the addPopulation function in every 1 minute;
-		// For testing purpose, the time is set to 1 seconds;
-		
-		this.time.events.loop(Phaser.Timer.SECOND * 1, this.addPopulation, this);
+		this.time.events.loop(Phaser.Timer.SECOND * 3, this.addPopulation, this);
 
 		// console.log(this);
 		// this.time = new Time(this);
@@ -556,16 +502,7 @@ playState.prototype = {
 	},
 
 	pauseGame: function () {
-
-		// if (!gamePause) {
-		// 	this.game.paused = true;
-		// 	gamePause = true;
-
-		// }
-		// else {
-		// 	this.game.paused = false;
-		// 	gamePause = false;
-		// }
+		// body...
 	},
 
 	update: function () {
@@ -578,19 +515,9 @@ playState.prototype = {
 	},
 
 	// Click the button and start the delivery
-	sendPlane: function () {
-		this.transports.sendPlane();
+	flyThePlane: function () {
+		this.transports.showOptions();
 		// this.flyThePlane.kill();
-
-		this.goPlane.inputEnabled = false;
-	},
-
-	sendConvoy: function () {
-		this.transports.sendConvoy();
-	},
-
-	sendPorters: function () {
-		this.transports.sendPorters();
 	},
 
 	checkLife: function () {
