@@ -2,16 +2,16 @@
 
 var playState = function (game) {
 	// console.log("Now starts the Play State!");
-}
+};
 
 var Camp = require('../obj/camp');
 var Warehouse = require('../obj/warehouse');
 var Items = require('../obj/items');
 var Transports = require('../obj/transports');
 
-var lives;
-var populationText;
-var scoreText;
+var lives = 3;
+var populationText = "";
+var scoreText = "";
 var gamePause = false;
 
 
@@ -48,8 +48,6 @@ playState.prototype = {
 
 		this.camp = new Camp(this.game, this.world.width/8, this.world.centerY);
 		this.game.add.existing(this.camp);
-
-
 		this.warehouse = new Warehouse(this.game, this.world.width*7/8, this.world.centerY);
 		this.game.add.existing(this.warehouse);
 
@@ -92,11 +90,6 @@ playState.prototype = {
 		populationText = this.add.bitmapText(this.world.width/20, this.world.height/20,'lastmileFont', 'Population: ' + this.camp.population, 20);
 		scoreText = this.add.bitmapText(this.world.width*15/20, this.world.height/20, 'lastmileFont', 'Scores: ' + this.scores, 20);
 		
-		// this.camp.expandStorage();
-		// this.warehouse.expandStorage();
-		// this.camp.showStock();
-		// this.warehouse.showStock();
-		
 
 		lives = this.add.group();
 		for (var i = 3; i > 0; i--) {
@@ -108,7 +101,7 @@ playState.prototype = {
 
 		this.items = new Items(this.game);
 		this.game.add.existing(this.items);
-		this.items.showBox();
+		// this.items.showBox();
 
 		// Time events: run the addPopulation function in every 1 minute;
 		// For testing purpose, the time is set to 1 seconds;
