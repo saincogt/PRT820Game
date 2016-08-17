@@ -45,11 +45,13 @@ var Camp = function (game, x, y, frame) {
 	};
 
 	// Show the items in the stock of camp warehouse.
-	this.campFoodText = game.add.bitmapText(game.world.width/20, game.world.height/20+25, 'lastmileFont', 'Food: ' + this.food, 15);
-	this.campWaterText = game.add.bitmapText(game.world.width/20, game.world.height/20+45, 'lastmileFont', 'Water: ' + this.water, 15);
-	this.campMedicineText = game.add.bitmapText(game.world.width/20, game.world.height/20+65, 'lastmileFont', 'Medicine: ' + this.medicine, 15);
-	this.campShelterText = game.add.bitmapText(game.world.width/20, game.world.height/20+85, 'lastmileFont', 'Shelter: ' + this.shelter, 15);
-	this.campStorageText = game.add.bitmapText(game.world.width/20, game.world.height/20+105, 'lastmileFont', 'Capacity: ' + this.storage, 15);
+	this.showStock = function () {
+		game.add.bitmapText(game.world.width/20, game.world.height/20+25, 'lastmileFont', 'Food: ' + this.food, 15);
+		game.add.bitmapText(game.world.width/20, game.world.height/20+45, 'lastmileFont', 'Water: ' + this.water, 15);
+		game.add.bitmapText(game.world.width/20, game.world.height/20+65, 'lastmileFont', 'Medicine: ' + this.medicine, 15);
+		game.add.bitmapText(game.world.width/20, game.world.height/20+85, 'lastmileFont', 'Shelter: ' + this.shelter, 15);
+		game.add.bitmapText(game.world.width/20, game.world.height/20+105, 'lastmileFont', 'Capacity: ' + this.storage, 15);
+	};
 
 	// Player will have the option to expand the storage in every 3 minutes.
 	this.expandStorage = function () {
