@@ -18,11 +18,6 @@ var Transports = function (game, x, y, frame) {
 	this.truck = game.add.sprite(game.world.width*7/8-90, game.world.centerY+160, 'truck');
 	this.truck.scale.setTo(0.08, 0.08);
 	this.truck.anchor.setTo(0.5, 0.5);
-
-
-	// Gray the truck;
-	// var gray = game.add.filter('Gray');
-	// this.truck.filters = [gray];
 	
 	// Convoy can carry 5 units;
 	this.truck.storage = 5;
@@ -41,23 +36,22 @@ var Transports = function (game, x, y, frame) {
 	this.porter.water = 0;
 	this.porter.medicine = 0;
 	this.porter.shelter = 0;
-	this.porter.population = 1000;
 
 	// Convoy takes 20 seconds, plane 5 seconds, porters 30 seconds to the camp;
 	this.sendPlane = function () {
 		// Tween the plane;
-		var tween = game.add.tween(this.plane).to({x: [game.world.width/2, game.world.width/8], y: [game.world.centerY-50, game.world.centerY+70]}, 5000, Phaser.Easing.Quadratic.InOut, true, 0);
-		tween.onComplete.add(this.PlaneOnComplete, this);
+		game.add.tween(this.plane).to({x: [game.world.width/2, game.world.width/8], y: [game.world.centerY-50, game.world.centerY+70]}, 5000, Phaser.Easing.Quadratic.InOut, true, 0);
+
 	};
 
 	this.sendConvoy = function () {
 		// Tween the truck;
 		var tween = game.add.tween(this.truck);
 		tween.to({x: game.world.width/8}, 20000, 'Linear', true, 0);
-		tween.onComplete.add(this.ConvoyOnComplete, this);
 	};
 
 	this.sendPorters = function () {
+<<<<<<< HEAD
 		// Tween the porters; 30 seconds
 		var tween = game.add.tween(this.porter).to({x: game.world.width/8}, 3000, 'Linear', true, 0);
 		tween.onComplete.add(this.PortersOnComplete, this);
@@ -97,6 +91,11 @@ var Transports = function (game, x, y, frame) {
 
 	};
 
+=======
+		// Tween the porters;
+		game.add.tween(this.porter).to({x: game.world.width/8}, 30000, 'Linear', true, 0);
+	};
+>>>>>>> parent of 88a02ed... Enabled the updates of items in camp and warehouse. When transportations arrived, add the items to the camp.
 };
 
 

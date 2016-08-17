@@ -38,13 +38,11 @@ playState.prototype = {
 		this.load.image('plane', 'src/assets/img/plane.png');
 		this.load.image('goButton', 'src/assets/img/goButton.png');
 		this.load.image('waiting', 'src/assets/img/waiting.png');
-		this.load.image('loadingzone', 'src/assets/img/loadingzone.png');
+		this.load.image('loadingzone', 'src/assets/img/loading zone.jpg');
 		this.load.image('failed', 'src/assets/img/fail.png');
-
 	},
 	create: function () {
 		this.add.image(0, 0, 'background');
-
 
 		this.camp = new Camp(this.game, this.world.width/8, this.world.centerY);
 		this.game.add.existing(this.camp);
@@ -53,8 +51,11 @@ playState.prototype = {
 
 		var loadingzone = this.game.add.image(this.world.width*7/8, this.world.centerY+150, 'loadingzone');
 		loadingzone.anchor.setTo(0.5, 0.5);
-		loadingzone.scale.setTo(0.16, 0.16);
+		loadingzone.scale.setTo(0.5, 0.5);
 
+		this.items = new Items(this.game);
+		this.game.add.existing(this.items);
+		this.items.showBox();
 
 		this.transports = new Transports(this.game);
 		this.game.add.existing(this.transports);
@@ -90,6 +91,14 @@ playState.prototype = {
 		populationText = this.add.bitmapText(this.world.width/20, this.world.height/20,'lastmileFont', 'Population: ' + this.camp.population, 20);
 		scoreText = this.add.bitmapText(this.world.width*15/20, this.world.height/20, 'lastmileFont', 'Scores: ' + this.scores, 20);
 		
+<<<<<<< HEAD
+=======
+		// this.camp.expandStorage();
+		this.camp.showStock();
+
+		// this.warehouse.expandStorage();
+		this.warehouse.showStock();
+>>>>>>> parent of 88a02ed... Enabled the updates of items in camp and warehouse. When transportations arrived, add the items to the camp.
 
 		lives = this.add.group();
 		for (var i = 3; i > 0; i--) {
@@ -99,14 +108,17 @@ playState.prototype = {
 			playerLife.alpha = 1;
 		};
 
+<<<<<<< HEAD
 		this.items = new Items(this.game);
 		this.game.add.existing(this.items);
 		// this.items.showBox();
 
+=======
+>>>>>>> parent of 88a02ed... Enabled the updates of items in camp and warehouse. When transportations arrived, add the items to the camp.
 		// Time events: run the addPopulation function in every 1 minute;
 		// For testing purpose, the time is set to 1 seconds;
 		
-		this.time.events.loop(Phaser.Timer.SECOND * 10, this.addPopulation, this);
+		this.time.events.loop(Phaser.Timer.SECOND * 1, this.addPopulation, this);
 
 		// console.log(this);
 		// this.time = new Time(this);
@@ -137,21 +149,7 @@ playState.prototype = {
 		// var delta = currTime - this.oldTime;
 		// this.oldTime = currTime;
 		// console.log(delta);
-		populationText.setText('Population: ' + this.camp.population);
-		scoreText.setText('Score: ' + this.scores);
-
-		this.camp.campFoodText.setText('Food: ' + this.camp.food);
-		this.camp.campWaterText.setText('Water: ' + this.camp.water);
-		this.camp.campMedicineText.setText('Medicine: ' + this.camp.medicine);
-		this.camp.campShelterText.setText('Shelter: ' + this.camp.shelter);
-		this.camp.campStorageText.setText('Capacity: ' + this.camp.storage);
-
-		this.warehouse.warehouseFoodText.setText('Food: ' + this.warehouse.food);
-		this.warehouse.warehouseWaterText.setText('Water: ' + this.warehouse.water);
-		this.warehouse.warehouseMedicineText.setText('Medicine: ' + this.warehouse.medicine);
-		this.warehouse.warehouseShelterText.setText('Shelter: ' + this.warehouse.shelter);
-		this.warehouse.warehouseStorageText.setText('Capacity: ' + this.warehouse.storage);
-
+	
 	},
 
 	// Click the button and start the delivery
@@ -160,17 +158,14 @@ playState.prototype = {
 		// this.flyThePlane.kill();
 
 		this.goPlane.inputEnabled = false;
-		// this.goPlane.kill();
 	},
 
 	sendConvoy: function () {
 		this.transports.sendConvoy();
-		this.goConvoy.inputEnabled = false;
 	},
 
 	sendPorters: function () {
 		this.transports.sendPorters();
-		this.goPorters.inputEnabled = false;
 	},
 
 	checkLife: function () {
@@ -195,6 +190,7 @@ playState.prototype = {
 	addPopulation: function () {
 		this.camp.population += 1000;
 		// this.add.tween(this.scoreText).to({alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
+		populationText.setText('Population: ' + this.camp.population);
 	},
 
 	render: function () {
