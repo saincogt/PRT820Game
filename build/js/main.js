@@ -12,120 +12,249 @@ game.state.add('menu', menuState);
 game.state.add('play', playState);
 
 game.state.start('menu');
-},{"./states/menu":6,"./states/play":7}],2:[function(require,module,exports){
-'use strict'
-
+},{"./states/menu":5,"./states/play":6}],2:[function(require,module,exports){
+var lives = 3;
+var scores = 50000;
 var Camp = function (game, x, y, frame) {
+	'use strict';
+	var itemTextLocation = {
+		x: game.world.width/20,
+		y: game.world.height/20 + 25
+	};
+
+	var livesLocation = {
+		x: game.world.width/2 - 100,
+		y: 60
+	};
+	var FONTSIZE = 15;
+	var nameList = ['Food', 'Water', 'Medicine', 'Shelter', 'Capacity'];
+
+	this.population = 1000;
+
 	Phaser.Sprite.call(this, game, x, y, 'camp', frame);
-	
+	this.name = 'camp';
 	this.anchor.setTo(0.5, 0.5);
 	this.scale.setTo(0.2, 0.2);
-	this.name = 'camp';
 
-	this.food = 0;
-	this.water = 0;
-	this.medicine = 0;
-	this.shelter = 0;
-	this.population = 1000;
-	
-	// Consumption rate of food is 1 unit per minute. For water: 90% of food.
-	// Comsumption rate of medicines: 20% of food. For shelters: 40% of food.
-	this.rateFood = 100;
-	this.rateWater = 90;
-	this.rateMedicine = 20;
-	this.rateShelter = 40;
 
-	// The camp warehouse starts with a capacity of 5 units.
-	this.storage = 5;
-	
-	// Population of the camp will be increased every minute.
+	lives = game.add.group();
+	for (var i = 3; i > 0; i--) {
+		var playerLife = lives.create(livesLocation.x + 40 * i, livesLocation.y, 'heartIcon');
+		playerLife.anchor.setTo(0.5, 0.5);
+		playerLife.scale.setTo(0.1, 0.1);
+		playerLife.alpha = 1;
+	}
+
+	this.items = {
+		name: ['food', 'water', 'medicine', 'shelter', 'storage'],
+		num: [0, 0, 0, 0, 500],
+		rate: [100, 90, 20, 40]
+	};
+
+	// Show the stock in the camp;
+	for (var k = 0; k < this.items.name.length; k++) {
+		game.add.bitmapText(itemTextLocation.x, itemTextLocation.y + 20 * k,
+			'lastmileFont', nameList[k] + ': ' + this.items.num[k],
+			FONTSIZE);
+	}
+
+	// funtions of the camp;
 	this.addPopulation = function () {
-		this.population = this.population + 1000;
-		console.log(this.population);
+		this.population += 1000;
 	};
 
-	// Show the items in the stock of camp warehouse.
-	this.campFoodText = game.add.bitmapText(game.world.width/20, game.world.height/20+25, 'lastmileFont', 'Food: ' + this.food, 15);
-	this.campWaterText = game.add.bitmapText(game.world.width/20, game.world.height/20+45, 'lastmileFont', 'Water: ' + this.water, 15);
-	this.campMedicineText = game.add.bitmapText(game.world.width/20, game.world.height/20+65, 'lastmileFont', 'Medicine: ' + this.medicine, 15);
-	this.campShelterText = game.add.bitmapText(game.world.width/20, game.world.height/20+85, 'lastmileFont', 'Shelter: ' + this.shelter, 15);
-	this.campStorageText = game.add.bitmapText(game.world.width/20, game.world.height/20+105, 'lastmileFont', 'Capacity: ' + this.storage, 15);
-
-	// Player will have the option to expand the storage in every 3 minutes.
+	// Player will have the option to expand the storage in every 3 minutes;
 	this.expandStorage = function () {
-		this.storage += 5;
-
+		this.items.num[4] += 500;
 	};
 
-	// Consume four items in every minute;
-	this.consume = function () {
-		this.food -= this.rateFood;
-		this.water -= this.rateWater;
-		this.medicine -= this.rateMedicine;
-		this.shelter -= this.rateShelter;
+	// Consume items in every minute;
+	this.consumeItems = function () {
+		if (lives.countLiving() > 0) {
+			var shortOfItems = false;
+			for (var j = 0; j < this.camp.items.name.length - 1; j++) {
+				if (this.camp.items.num[j] >= this.camp.items.rate[j] * this.camp.population / 1000) {
+					this.camp.items.num[j] -= this.camp.items.rate[j] * this.camp.population / 1000;
+				} else {
+					this.camp.items.num[j] = 0;
+					shortOfItems = true;
+				}
+			}
+			if (shortOfItems) {
+				this.camp.lossLife();
+			}
+		} else {
+			return;
+		}
 	};
 
+	this.lossLife = function () {
+		var stillAlive = lives.getFirstAlive();
+		if (stillAlive) {
+			stillAlive.kill();
+			console.log(lives.countLiving());
+		}
+		if (lives.countLiving() < 1) {
+			var gameOver = game.add.bitmapText(game.world.width/2, game.world.height/2,'lastmileFont', 'Game Over!\n Your Score: ' + scores, 20);
+			gameOver.anchor.setTo(0.5, 0.5);
+			return;
+		}
+
+	};
 };
 
 Camp.prototype = Object.create(Phaser.Sprite.prototype);
-// Camp.prototype.constructor = Camp;
 
 module.exports = Camp;
-},{}],3:[function(require,module,exports){
-'use strict'
 
-var Items = function (game, x, y, frame) {
+},{}],3:[function(require,module,exports){
+'use strict';
+var Transports = function (game, x, y, frame) {
 	Phaser.Sprite.call(this, game, x, y, frame);
 
-	this.showBox = function () {
+	var optionLocation = {
+		x: game.world.width * 7 / 8 - 90,
+		y: game.world.centerY + 100
+	};
 
-		var group = game.add.group();
-		group.inputEnableChildren = true;
+	var transName = ['plane', 'truck', 'porter'];
+	var options = [];
+	var group;
 
-		var foodBox = group.create(game.world.width*15/20, game.world.height*5.5/20, 'foodBox');
-		foodBox.name = 'foodBox';
-		foodBox.alpha = 0.6;
+	this.name = 'transports';
+	this.plane = {
+		food: 100,
+		medicine: 100,
+		storage: 0,
+		commute: 5,
+		cooldown: 40
+	};
+	this.truck = {
+		food: 0,
+		water: 0,
+		medicine: 0,
+		shelter: 0,
+		storage: 5,
+		commute: 20
+	};
+	this.porter = {
+		food: 0,
+		water: 0,
+		medicine: 0,
+		shelter: 0,
+		storage: 5,
+		commute: 30,
+		population: 1000
+	};
 
-		var waterBox = group.create(game.world.width*16/20, game.world.height*5.5/20, 'waterBox');
-		waterBox.name = 'waterBox';
-		waterBox.alpha = 0.6;
+	group = game.add.group();
+	for (var i = 0; i < 3; i++) {
+		options[i] = group.create(optionLocation.x, optionLocation.y + 60 * i, transName[i]);
+		options[i].anchor.setTo(0.5, 0.5);
+		options[i].scale.setTo(0.1, 0.1);
+	}
 
-		var medicineBox = group.create(game.world.width*17/20, game.world.height*5.5/20, 'medicineBox');
-		medicineBox.name = 'medicineBox';
-		medicineBox.alpha = 0.6;
+	// Convoy takes 20 seconds, plane 5 seconds, porters 30 seconds to the camp;
+	this.sendPlane = function () {
+		// Tween the plane 5 seconds;
+		var tween = game.add.tween(options[0]);
+		tween.to({x: [game.world.width/2, game.world.width/8],
+			y: [game.world.centerY-50, game.world.centerY+70]}, 500,
+			Phaser.Easing.Quadratic.InOut, true, 0);
+		tween.onComplete.add(this.PlaneOnComplete, this);
+	};
 
-		var shelterBox = group.create(game.world.width*18/20, game.world.height*5.5/20, 'shelterBox');
-		shelterBox.name = 'shelterBox';
-		shelterBox.alpha = 0.6;
+	this.sendConvoy = function () {
+		// Tween the truck 20 seconds;
+		var tween = game.add.tween(options[1]);
+		tween.to({x: game.world.width/8}, 2000, 'Linear', true, 0);
+		tween.onComplete.add(this.ConvoyOnComplete, this);
+	};
 
-		// var foodBox = game.add.image(game.world.width*15/20, game.world.height*5.5/20, 'foodBox');
-		foodBox.anchor.setTo(0.5, 0.5);
-		foodBox.scale.setTo(0.4, 0.4);
-		// foodBox.inputEnabled = true;
-		foodBox.input.enableDrag();
+	this.sendPorters = function () {
+		// Tween the porters; 30 seconds
+		var tween = game.add.tween(options[2]).to({x: game.world.width/8}, 3000, 'Linear', true, 0);
+		tween.onComplete.add(this.PortersOnComplete, this);
+	};
 
-		// var waterBox = game.add.image(game.world.width*16/20, game.world.height*5.5/20, 'waterBox');
-		waterBox.anchor.setTo(0.5, 0.5);
-		waterBox.scale.setTo(0.4, 0.4);
-		// waterBox.inputEnabled = true;
-		waterBox.input.enableDrag();
+	this.PlaneOnComplete = function (game) {
+		game.camp.items.num[0] += this.plane.food;
+		game.camp.items.num[2] += this.plane.medicine;
+		console.log(mycamp.camp.items);
+	};
 
-		// var medicineBox = game.add.image(game.world.width*17/20, game.world.height*5.5/20, 'medicineBox');
-		medicineBox.anchor.setTo(0.5, 0.5);
-		medicineBox.scale.setTo(0.4, 0.4);
-		// medicineBox.inputEnabled = true;
-		medicineBox.input.enableDrag();
+	this.ConvoyOnComplete = function () {
+		console.log('Convoy Arrived');
+	};
 
-		// var shelterBox = game.add.image(game.world.width*18/20, game.world.height*5.5/20, 'shelterBox');
-		shelterBox.anchor.setTo(0.5, 0.5);
-		shelterBox.scale.setTo(0.4, 0.4);
-		// shelterBox.inputEnabled = true;
-		shelterBox.input.enableDrag();
+	this.PortersOnComplete = function () {
+		console.log('Porters Arrived');
+	};
 
-		group.onChildInputOver.add(this.onOver, this);
-		group.onChildInputOut.add(this.onOut, this);
-		group.onChildInputDown.add(this.onDown, this);
+};
+Transports.prototype = Object.create(Phaser.Sprite.prototype);
+module.exports = Transports;
 
+},{}],4:[function(require,module,exports){
+var Warehouse = function (game, x, y, frame) {
+	'use strict';
+	var itemTextLocation = {
+		x: game.world.width*15/20,
+		y: game.world.height/20 + 25
+	};
+
+	var itemBoxLocation = {
+		x: game.world.width*15/20,
+		y: game.world.height*5.5/20
+	};
+	var FONTSIZE = 15;
+
+	var myBox = [];
+	var group;
+
+	Phaser.Sprite.call(this, game, x, y, 'warehouse', frame);
+
+	this.name = 'warehouse';
+	this.anchor.setTo(0.5, 0.5);
+	this.scale.setTo(0.2, 0.2);
+	var nameList = ['Food', 'Water', 'Medicine', 'Shelter', 'Capacity'];
+
+	this.items = {
+		name: ['food', 'water', 'medicine', 'shelter', 'storage'],
+		num: [700, 700, 300, 300, 2000]
+	};
+
+	this.ship = {
+		name: ['food', 'water', 'medicine', 'shelter'],
+		num: [300, 300, 200, 200]
+	};
+
+	// Show the stock in the warehouse
+	for (var i = 0; i < this.items.name.length; i++) {
+		game.add.bitmapText(itemTextLocation.x, itemTextLocation.y + 20 * i,
+			'lastmileFont', nameList[i] + ': ' + this.items.num[i],
+			FONTSIZE);
+	}
+
+	// Player will have the option to expand the storage by 10 units in every 5 minutes;
+	this.expandStorage = function () {
+		this.items.num[4] += 1000;
+	};
+
+	// Show boxes
+	group = game.add.group();
+	group.inputEnableChildren = true;
+	for (var j = 0; j < 4; j++) {
+		myBox[j] = group.create(itemBoxLocation.x + 50 * j,
+			itemBoxLocation.y, this.items.name[j]);
+		myBox[j].alpha = 0.8;
+		myBox[j].anchor.setTo(0.5, 0.5);
+		myBox[j].scale.setTo(0.4, 0.4);
+		myBox[j].input.enableDrag();
+	}
+
+	this.onDown = function (sprite) {
+		sprite.tint = 0xffffff;
 	};
 
 	this.onOver = function (sprite) {
@@ -135,204 +264,15 @@ var Items = function (game, x, y, frame) {
 	this.onOut = function (sprite) {
 		sprite.alpha = 0.6;
 	};
-	this.onDown = function (sprite) {
-		sprite.tint = 0xffffff;
-	};
 
+	group.onChildInputDown.add(this.onDown, this);
+	group.onChildInputOut.add(this.onOut, this);
+	group.onChildInputOver.add(this.onOver, this);
 };
-
-Items.prototype = Object.create(Phaser.Sprite.prototype);
-
-module.exports = Items;
-
-
-},{}],4:[function(require,module,exports){
-'use strict'
-
-var Transports = function (game, x, y, frame) {
-	Phaser.Sprite.call(this, game, x, y, frame);
-
-	this.plane = game.add.sprite(game.world.width*7/8-90, game.world.centerY+100, 'plane');
-	this.plane.scale.setTo(0.09, 0.09);
-	this.plane.anchor.setTo(0.5, 0.5);
-	
-	// Plane can carry 2 units; 
-	// No water and shelter;
-	this.plane.storage = 2;
-	this.plane.food = 0;
-	// this.plane.water = 0;
-	this.plane.medicine = 0;
-	// this.plane.shelter = 0;
-
-	this.truck = game.add.sprite(game.world.width*7/8-90, game.world.centerY+160, 'truck');
-	this.truck.scale.setTo(0.08, 0.08);
-	this.truck.anchor.setTo(0.5, 0.5);
-
-
-	// Gray the truck;
-	// var gray = game.add.filter('Gray');
-	// this.truck.filters = [gray];
-	
-	// Convoy can carry 5 units;
-	this.truck.storage = 5;
-	this.truck.food = 0;
-	this.truck.water = 0;
-	this.truck.medicine = 0;
-	this.truck.shelter = 0;
-	
-	this.porter = game.add.sprite(game.world.width*7/8-90, game.world.centerY+220, 'porter');
-	this.porter.scale.setTo(0.15, 0.15);
-	this.porter.anchor.setTo(0.5, 0.5);
-
-	// Porters can carry 5 units;
-	this.porter.storage = 5;
-	this.porter.food = 0;
-	this.porter.water = 0;
-	this.porter.medicine = 0;
-	this.porter.shelter = 0;
-	this.porter.population = 1000;
-
-	// Convoy takes 20 seconds, plane 5 seconds, porters 30 seconds to the camp;
-	this.sendPlane = function () {
-		// Tween the plane;
-		var tween = game.add.tween(this.plane).to({x: [game.world.width/2, game.world.width/8], y: [game.world.centerY-50, game.world.centerY+70]}, 5000, Phaser.Easing.Quadratic.InOut, true, 0);
-		tween.onComplete.add(this.PlaneOnComplete, this);
-	};
-
-	this.sendConvoy = function () {
-		// Tween the truck;
-		var tween = game.add.tween(this.truck);
-		tween.to({x: game.world.width/8}, 20000, 'Linear', true, 0);
-		tween.onComplete.add(this.ConvoyOnComplete, this);
-	};
-
-	this.sendPorters = function () {
-		// Tween the porters; 30 seconds
-		var tween = game.add.tween(this.porter).to({x: game.world.width/8}, 3000, 'Linear', true, 0);
-		tween.onComplete.add(this.PortersOnComplete, this);
-	};
-
-	this.PlaneOnComplete = function () {
-		console.log('Plane Arrived');
-
-		// (-_-;) complicated
-		game.state.states.play.camp.food += this.plane.food;
-		// game.state.states.play.camp.water += this.plane.water;
-		game.state.states.play.camp.medicine += this.plane.medicine;
-		// game.state.states.play.camp.shelter += this.plane.shelter;
-
-		console.log(game.state.states.play.camp.food);
-		
-	};
-
-	this.ConvoyOnComplete = function () {
-		console.log('Convoy Arrived');
-		game.state.states.play.camp.food += this.truck.food;
-		game.state.states.play.camp.water += this.truck.water;
-		game.state.states.play.camp.medicine += this.truck.medicine;
-		game.state.states.play.camp.shelter += this.truck.shelter;
-
-	};
-
-	this.PortersOnComplete = function () {
-		console.log('Porters Arrived');
-		game.state.states.play.camp.food += this.porter.food;
-		game.state.states.play.camp.water += this.porter.water;
-		game.state.states.play.camp.medicine += this.porter.medicine;
-		game.state.states.play.camp.shelter += this.porter.shelter;
-		game.state.states.play.camp.population += this.porter.population;
-
-		console.log(game.state.states.play.camp.population);
-
-	};
-
-};
-
-
-Transports.prototype = Object.create(Phaser.Sprite.prototype);
-
-module.exports = Transports;
-
-/**
-* This turns your displayObjects to grayscale.
-* @class Gray
-* @contructor
-*/
-Phaser.Filter.Gray = function (game) {
-
-    Phaser.Filter.call(this, game);
-
-    this.uniforms.gray = { type: '1f', value: 1.0 };
-
-    this.fragmentSrc = [
-
-        "precision mediump float;",
-
-        "varying vec2       vTextureCoord;",
-        "varying vec4       vColor;",
-        "uniform sampler2D  uSampler;",
-        "uniform float      gray;",
-
-        "void main(void) {",
-            "gl_FragColor = texture2D(uSampler, vTextureCoord);",
-            "gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.2126 * gl_FragColor.r + 0.7152 * gl_FragColor.g + 0.0722 * gl_FragColor.b), gray);",
-        "}"
-    ];
-
-};
-
-Phaser.Filter.Gray.prototype = Object.create(Phaser.Filter.prototype);
-Phaser.Filter.Gray.prototype.constructor = Phaser.Filter.Gray;
-
-/**
-* The strength of the gray. 1 will make the object black and white, 0 will make the object its normal color
-* @property gray
-*/
-Object.defineProperty(Phaser.Filter.Gray.prototype, 'gray', {
-
-    get: function() {
-        return this.uniforms.gray.value;
-    },
-
-    set: function(value) {
-        this.uniforms.gray.value = value;
-    }
-
-});
-},{}],5:[function(require,module,exports){
-'use strict'
-
-var Warehouse = function (game, x, y, frame) {
-	Phaser.Sprite.call(this, game, x, y, 'warehouse', frame);
-
-	this.anchor.setTo(0.5, 0.5);
-	this.scale.setTo(0.2, 0.2);
-	this.name = 'warehouse';
-
-	this.food = 0;
-	this.water = 0;
-	this.medicine = 0;
-	this.shelter = 0;
-	this.storage = 20;
-
-	// Display the stock in the warehouse.
-	this.warehouseFoodText = game.add.bitmapText(game.world.width*15/20, game.world.height/20+25, 'lastmileFont', 'Food: ' + this.food, 15);
-	this.warehouseWaterText = game.add.bitmapText(game.world.width*15/20, game.world.height/20+45, 'lastmileFont', 'Water: ' + this.water, 15);
-	this.warehouseMedicineText = game.add.bitmapText(game.world.width*15/20, game.world.height/20+65, 'lastmileFont', 'Medicine: ' + this.medicine, 15);
-	this.warehouseShelterText = game.add.bitmapText(game.world.width*15/20, game.world.height/20+85, 'lastmileFont', 'Shelter: ' + this.shelter, 15);
-	this.warehouseStorageText = game.add.bitmapText(game.world.width*15/20, game.world.height/20+105, 'lastmileFont', 'Capacity: ' + this.storage, 15);
-
-	// Player will have the option to expand the storage by 10 units in every 5 minutes.
-	this.expandStorage = function () {
-		this.storage += 10;
-	};
-};
-
 Warehouse.prototype = Object.create(Phaser.Sprite.prototype);
-
 module.exports = Warehouse;
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict'
 
 var menuState = function (game) {
@@ -382,19 +322,16 @@ menuState.prototype = {
 };
 module.exports = menuState;
 
-},{}],7:[function(require,module,exports){
-'use strict'
-
+},{}],6:[function(require,module,exports){
 var playState = function (game) {
+	'use strict'
 	// console.log("Now starts the Play State!");
-}
+};
 
 var Camp = require('../obj/camp');
 var Warehouse = require('../obj/warehouse');
-var Items = require('../obj/items');
 var Transports = require('../obj/transports');
 
-var lives;
 var populationText;
 var scoreText;
 var gamePause = false;
@@ -406,16 +343,14 @@ playState.prototype = {
 		this.load.image('background', 'src/assets/img/background.jpg');
 		this.load.image('camp', 'src/assets/img/camp-1.png');
 		this.load.image('convoy', 'src/assets/img/convoy.png');
-		this.load.image('food', 'src/assets/img/food.png');
 		this.load.image('porter', 'src/assets/img/porter-1.png');
-		this.load.image('shelter', 'src/assets/img/shelter.png');
 		this.load.image('warehouse', 'src/assets/img/warehouse-1.png');
 		this.load.image('back', 'src/assets/img/backArrow.png');
 		this.load.image('pause', 'src/assets/img/pause.png');
-		this.load.image('waterBox', 'src/assets/img/waterBox.png');
-		this.load.image('foodBox', 'src/assets/img/foodBox.png');
-		this.load.image('medicineBox', 'src/assets/img/medicineBox.png');
-		this.load.image('shelterBox', 'src/assets/img/shelterBox.png');
+		this.load.image('water', 'src/assets/img/waterBox.png');
+		this.load.image('food', 'src/assets/img/foodBox.png');
+		this.load.image('medicine', 'src/assets/img/medicineBox.png');
+		this.load.image('shelter', 'src/assets/img/shelterBox.png');
 		this.load.bitmapFont('lastmileFont', 'src/assets/font/font.png', 'src/assets/font/font.fnt');
 		this.load.image('heartOutline', 'src/assets/img/heart-outline.png');
 		this.load.image('heartIcon', 'src/assets/img/heart-icon.png');
@@ -430,10 +365,11 @@ playState.prototype = {
 	create: function () {
 		this.add.image(0, 0, 'background');
 
-
 		this.camp = new Camp(this.game, this.world.width/8, this.world.centerY);
 		this.game.add.existing(this.camp);
 
+		this.transports = new Transports(this.game);
+		this.game.add.existing(this.transports);
 
 		this.warehouse = new Warehouse(this.game, this.world.width*7/8, this.world.centerY);
 		this.game.add.existing(this.warehouse);
@@ -441,10 +377,6 @@ playState.prototype = {
 		var loadingzone = this.game.add.image(this.world.width*7/8, this.world.centerY+150, 'loadingzone');
 		loadingzone.anchor.setTo(0.5, 0.5);
 		loadingzone.scale.setTo(0.16, 0.16);
-
-
-		this.transports = new Transports(this.game);
-		this.game.add.existing(this.transports);
 
 		this.goPlane = this.add.button(this.world.width*7/8-180, this.world.centerY+100, 'goButton', this.sendPlane, this);
 		this.goPlane.scale.setTo(0.5, 0.5);
@@ -458,10 +390,9 @@ playState.prototype = {
 		this.goPorters.scale.setTo(0.5, 0.5);
 		this.goPorters.anchor.setTo(0.5, 0.5);
 
-		this.killALife = this.add.button(this.world.width/2+ 100, 60, 'failed', this.failedToSatisfy, this);
+		this.killALife = this.add.button(this.world.width/2+ 100, 60, 'failed', this.camp.lossLife, this);
 		this.killALife.scale.setTo(0.5, 0.5);
 		this.killALife.anchor.setTo(0.5, 0.5);
-
 
 		var backArrow = this.add.button(this.world.width*1.5/20, this.world.height*18/20, 'back', this.goBack, this);
 		backArrow.scale.setTo(0.05, 0.05);
@@ -471,34 +402,16 @@ playState.prototype = {
 		pause.scale.setTo(0.05, 0.05);
 		pause.anchor.setTo(0.5, 0.5);
 
-
 		this.scores = 50000;
 
 		populationText = this.add.bitmapText(this.world.width/20, this.world.height/20,'lastmileFont', 'Population: ' + this.camp.population, 20);
 		scoreText = this.add.bitmapText(this.world.width*15/20, this.world.height/20, 'lastmileFont', 'Scores: ' + this.scores, 20);
-		
-		// this.camp.expandStorage();
-		// this.warehouse.expandStorage();
-		// this.camp.showStock();
-		// this.warehouse.showStock();
-		
-
-		lives = this.add.group();
-		for (var i = 3; i > 0; i--) {
-			var playerLife = lives.create(this.world.width/2 - 100 + (40 * i), 60, 'heartIcon');
-			playerLife.anchor.setTo(0.5, 0.5);
-			playerLife.scale.setTo(0.1, 0.1);
-			playerLife.alpha = 1;
-		};
-
-		this.items = new Items(this.game);
-		this.game.add.existing(this.items);
-		this.items.showBox();
 
 		// Time events: run the addPopulation function in every 1 minute;
 		// For testing purpose, the time is set to 1 seconds;
-		
+
 		this.time.events.loop(Phaser.Timer.SECOND * 10, this.addPopulation, this);
+		// this.time.events.loop(Phaser.Timer.SECOND * 2, this.camp.consumeItems, this);
 
 		// console.log(this);
 		// this.time = new Time(this);
@@ -532,17 +445,17 @@ playState.prototype = {
 		populationText.setText('Population: ' + this.camp.population);
 		scoreText.setText('Score: ' + this.scores);
 
-		this.camp.campFoodText.setText('Food: ' + this.camp.food);
-		this.camp.campWaterText.setText('Water: ' + this.camp.water);
-		this.camp.campMedicineText.setText('Medicine: ' + this.camp.medicine);
-		this.camp.campShelterText.setText('Shelter: ' + this.camp.shelter);
-		this.camp.campStorageText.setText('Capacity: ' + this.camp.storage);
+		// this.camp.campFoodText.setText('Food: ' + this.camp.food);
+		// this.camp.campWaterText.setText('Water: ' + this.camp.water);
+		// this.camp.campMedicineText.setText('Medicine: ' + this.camp.medicine);
+		// this.camp.campShelterText.setText('Shelter: ' + this.camp.shelter);
+		// this.camp.campStorageText.setText('Capacity: ' + this.camp.storage);
 
-		this.warehouse.warehouseFoodText.setText('Food: ' + this.warehouse.food);
-		this.warehouse.warehouseWaterText.setText('Water: ' + this.warehouse.water);
-		this.warehouse.warehouseMedicineText.setText('Medicine: ' + this.warehouse.medicine);
-		this.warehouse.warehouseShelterText.setText('Shelter: ' + this.warehouse.shelter);
-		this.warehouse.warehouseStorageText.setText('Capacity: ' + this.warehouse.storage);
+		// this.warehouse.warehouseFoodText.setText('Food: ' + this.warehouse.food);
+		// this.warehouse.warehouseWaterText.setText('Water: ' + this.warehouse.water);
+		// this.warehouse.warehouseMedicineText.setText('Medicine: ' + this.warehouse.medicine);
+		// this.warehouse.warehouseShelterText.setText('Shelter: ' + this.warehouse.shelter);
+		// this.warehouse.warehouseStorageText.setText('Capacity: ' + this.warehouse.storage);
 
 	},
 
@@ -565,34 +478,15 @@ playState.prototype = {
 		this.goPorters.inputEnabled = false;
 	},
 
-	checkLife: function () {
-		
-	},
-
-	// Player will have 3 'lives', failed to satisfy the consumption will lose one 'life';
-	failedToSatisfy: function () {
-		var live = lives.getFirstAlive();
-		if (live) {
-			live.kill();
-		};
-
-		// If the player have less than 1 life, then game will be over;
-		if (lives.countLiving() < 1) {
-			var gameOver = this.add.bitmapText(this.world.width/2, this.world.height/2,'lastmileFont', 'Game Over!\n Your Score:' + this.scores, 20);
-			gameOver.anchor.setTo(0.5, 0.5);
-			// this.killALife.kill();
-		};
-	},
-
 	addPopulation: function () {
 		this.camp.population += 1000;
 		// this.add.tween(this.scoreText).to({alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
 	},
 
 	render: function () {
-		this.game.debug.body(this.transports.plane);
+		this.game.debug.body(this.camp);
 	}
 };
 
 module.exports = playState;
-},{"../obj/camp":2,"../obj/items":3,"../obj/transports":4,"../obj/warehouse":5}]},{},[1])
+},{"../obj/camp":2,"../obj/transports":3,"../obj/warehouse":4}]},{},[1])
