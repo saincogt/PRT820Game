@@ -9,7 +9,7 @@ game.state.add('menu', menuState);
 // game.state.add('load', loadState);
 // game.state.add('menu', menuState);
 game.state.add('play', playState);
-// game.state.add('score', scoreState);
+game.state.add('over', overState);
 
 // After adding the states, we can start the first state
 
@@ -25,5 +25,5 @@ function create() {
 };
 
 function update() {
-	
+
 };

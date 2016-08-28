@@ -1,7 +1,11 @@
 var lives = 3;
 var scores = 50000;
+var CAMP_IMAGE = 'camp';
+
 var Camp = function (game, x, y, frame) {
 	'use strict';
+
+
 	var itemTextLocation = {
 		x: game.world.width/20,
 		y: game.world.height/20 + 25
@@ -16,17 +20,15 @@ var Camp = function (game, x, y, frame) {
 
 	this.population = 1000;
 
-	Phaser.Sprite.call(this, game, x, y, 'camp', frame);
+	Phaser.Sprite.call(this, game, x, y, CAMP_IMAGE, frame);
 	this.name = 'camp';
 	this.anchor.setTo(0.5, 0.5);
-	this.scale.setTo(0.2, 0.2);
 
 
 	lives = game.add.group();
 	for (var i = 3; i > 0; i--) {
 		var playerLife = lives.create(livesLocation.x + 40 * i, livesLocation.y, 'heartIcon');
 		playerLife.anchor.setTo(0.5, 0.5);
-		playerLife.scale.setTo(0.1, 0.1);
 		playerLife.alpha = 1;
 	}
 
@@ -77,17 +79,22 @@ var Camp = function (game, x, y, frame) {
 		var stillAlive = lives.getFirstAlive();
 		if (stillAlive) {
 			stillAlive.kill();
-			console.log(lives.countLiving());
 		}
 		if (lives.countLiving() < 1) {
-			var gameOver = game.add.bitmapText(game.world.width/2, game.world.height/2,'lastmileFont', 'Game Over!\n Your Score: ' + scores, 20);
-			gameOver.anchor.setTo(0.5, 0.5);
-			return;
+			// var gameOver = game.add.bitmapText(game.world.width/2, game.world.height/2,'lastmileFont', 'Game Over!\n Your Score: ' + scores, 20);
+			// gameOver.anchor.setTo(0.5, 0.5);
+			// return;
+			game.state.start('over');
 		}
 
 	};
 };
 
 Camp.prototype = Object.create(Phaser.Sprite.prototype);
+
+Camp.prototype.assets = {
+	camp: 'src/assets/img/camp.png',
+	heartIcon: 'src/assets/img/heart-icon.png'
+};
 
 module.exports = Camp;
