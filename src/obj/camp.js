@@ -39,8 +39,9 @@ var Camp = function (game, x, y, frame) {
 	};
 
 	// Show the stock in the camp;
+	this.stock = [];
 	for (var k = 0; k < this.items.name.length; k++) {
-		game.add.bitmapText(itemTextLocation.x, itemTextLocation.y + 20 * k,
+		this.stock[k] = game.add.bitmapText(itemTextLocation.x, itemTextLocation.y + 20 * k,
 			'lastmileFont', nameList[k] + ': ' + this.items.num[k],
 			FONTSIZE);
 	}

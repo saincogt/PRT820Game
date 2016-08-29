@@ -119,17 +119,17 @@ playState.prototype = {
 		populationText.setText('Population: ' + this.camp.population);
 		scoreText.setText('Score: ' + this.scores);
 
-		// this.camp.campFoodText.setText('Food: ' + this.camp.food);
-		// this.camp.campWaterText.setText('Water: ' + this.camp.water);
-		// this.camp.campMedicineText.setText('Medicine: ' + this.camp.medicine);
-		// this.camp.campShelterText.setText('Shelter: ' + this.camp.shelter);
-		// this.camp.campStorageText.setText('Capacity: ' + this.camp.storage);
+		this.warehouse.stock[0].setText('Food: ' + this.warehouse.items.num[0]);
+		this.warehouse.stock[1].setText('Water: ' + this.warehouse.items.num[1]);
+		this.warehouse.stock[2].setText('Medicine: ' + this.warehouse.items.num[2]);
+		this.warehouse.stock[3].setText('Shelter: ' + this.warehouse.items.num[3]);
+		this.warehouse.stock[4].setText('Capacity: ' + this.warehouse.items.num[4]);
 
-		// this.warehouse.warehouseFoodText.setText('Food: ' + this.warehouse.food);
-		// this.warehouse.warehouseWaterText.setText('Water: ' + this.warehouse.water);
-		// this.warehouse.warehouseMedicineText.setText('Medicine: ' + this.warehouse.medicine);
-		// this.warehouse.warehouseShelterText.setText('Shelter: ' + this.warehouse.shelter);
-		// this.warehouse.warehouseStorageText.setText('Capacity: ' + this.warehouse.storage);
+		this.camp.stock[0].setText('Food: ' + this.camp.items.num[0]);
+		this.camp.stock[1].setText('Water: ' + this.camp.items.num[1]);
+		this.camp.stock[2].setText('Medicine: ' + this.camp.items.num[2]);
+		this.camp.stock[3].setText('Shelter: ' + this.camp.items.num[3]);
+		this.camp.stock[4].setText('Capacity: ' + this.camp.items.num[4]);
 
 	},
 

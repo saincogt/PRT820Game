@@ -56,8 +56,9 @@ var Camp = function (game, x, y, frame) {
 	};
 
 	// Show the stock in the camp;
+	this.stock = [];
 	for (var k = 0; k < this.items.name.length; k++) {
-		game.add.bitmapText(itemTextLocation.x, itemTextLocation.y + 20 * k,
+		this.stock[k] = game.add.bitmapText(itemTextLocation.x, itemTextLocation.y + 20 * k,
 			'lastmileFont', nameList[k] + ': ' + this.items.num[k],
 			FONTSIZE);
 	}
@@ -285,7 +286,7 @@ var Warehouse = function (game, x, y, frame) {
 	var nameList = ['Food', 'Water', 'Medicine', 'Shelter', 'Capacity'];
 	var BOX_VALUE = 100;
 
-	var items = {
+	this.items = {
 		name: ['food', 'water', 'medicine', 'shelter', 'storage'],
 		num: [700, 700, 300, 300, 2000]
 	};
@@ -296,34 +297,44 @@ var Warehouse = function (game, x, y, frame) {
 	};
 
 	// Show the stock in the warehouse
-	for (var i = 0; i < items.name.length; i++) {
-		game.add.bitmapText(itemTextLocation.x, itemTextLocation.y + 20 * i,
-			'lastmileFont', nameList[i] + ': ' + items.num[i],
+	this.stock = [];
+	for (var i = 0; i < this.items.name.length; i++) {
+		this.stock[i] = game.add.bitmapText(itemTextLocation.x, itemTextLocation.y + 20 * i,
+			'lastmileFont', nameList[i] + ': ' + this.items.num[i],
 			FONTSIZE);
 	}
 
 	// Player will have the option to expand the storage by 10 units in every 5 minutes;
 	this.expandStorage = function () {
-		items.num[4] += 1000;
+		this.items.num[4] += 1000;
 	};
 
 	var addFood = function (currentSprite, endSprite) {
 		if (endSprite.items.food < endSprite.storage) {
 			endSprite.items.food += BOX_VALUE;
-			items.name[0] -= BOX_VALUE;
+			game.state.states.play.warehouse.items.num[0] -= BOX_VALUE;
 		}
 	};
 
 	var addWater = function (currentSprite, endSprite) {
-		// body...
+		if (endSprite.items.water < endSprite.storage && endSprite.key !== 'plane') {
+			endSprite.items.water += BOX_VALUE;
+			game.state.states.play.warehouse.items.num[1] -= BOX_VALUE;
+		}
 	};
 
 	var addMedicine = function (currentSprite, endSprite) {
-		// body...
+		if (endSprite.items.medicine < endSprite.storage) {
+			endSprite.items.medicine += BOX_VALUE;
+			game.state.states.play.warehouse.items.num[2] -= BOX_VALUE;
+		}
 	};
 
 	var addShelter = function (currentSprite, endSprite) {
-		// body...
+		if (endSprite.items.shelter < endSprite.storage && endSprite.key !== 'plane') {
+			endSprite.items.shelter += BOX_VALUE;
+			game.state.states.play.warehouse.items.num[3] -= BOX_VALUE;
+		}
 	};
 
 	// When stop dragging call other funtion and reset locations;
@@ -340,10 +351,9 @@ var Warehouse = function (game, x, y, frame) {
 	};
 
 	var stopDragWater = function (currentSprite, endSprite) {
-		if (!game.physics.arcade.overlap(currentSprite, endSprite, function () {
-			// body...
-		})) {
+		if (!game.physics.arcade.overlap(currentSprite, endSprite, function (currentSprite, endSprite) {
 			addWater(currentSprite, endSprite);
+		})) {
 			currentSprite.position.copyFrom(currentSprite.originalPosition);
 		} else {
 			currentSprite.position.copyFrom(currentSprite.originalPosition);
@@ -351,11 +361,23 @@ var Warehouse = function (game, x, y, frame) {
 	};
 
 	var stopDragMedicine = function (currentSprite, endSprite) {
-
+		if (!game.physics.arcade.overlap(currentSprite, endSprite, function (currentSprite, endSprite) {
+			addMedicine(currentSprite, endSprite);
+		})) {
+			currentSprite.position.copyFrom(currentSprite.originalPosition);
+		} else {
+			currentSprite.position.copyFrom(currentSprite.originalPosition);
+		}
 	};
 
 	var stopDragShelter = function (currentSprite, endSprite) {
-		// body...
+		if (!game.physics.arcade.overlap(currentSprite, endSprite, function (currentSprite, endSprite) {
+			addShelter(currentSprite, endSprite);
+		})) {
+			currentSprite.position.copyFrom(currentSprite.originalPosition);
+		} else {
+			currentSprite.position.copyFrom(currentSprite.originalPosition);
+		}
 	};
 
 
@@ -364,8 +386,8 @@ var Warehouse = function (game, x, y, frame) {
 	group.inputEnableChildren = true;
 	for (var j = 0; j < 4; j++) {
 		myBox[j] = group.create(itemBoxLocation.x + 50 * j,
-			itemBoxLocation.y, items.name[j]);
-		myBox[j].alpha = 0.8;
+			itemBoxLocation.y, this.items.name[j]);
+		myBox[j].alpha = 1;
 		myBox[j].anchor.setTo(0.5, 0.5);
 		myBox[j].input.enableDrag();
 		myBox[j].input.enableSnap(32, 32, false, true);
@@ -391,6 +413,7 @@ var Warehouse = function (game, x, y, frame) {
 
 	this.onDown = function (sprite) {
 		sprite.tint = 0xffffff;
+		sprite.alpha = 0.8;
 	};
 
 	this.onOver = function (sprite) {
@@ -398,7 +421,7 @@ var Warehouse = function (game, x, y, frame) {
 	};
 
 	this.onOut = function (sprite) {
-		sprite.alpha = 0.8;
+		sprite.alpha = 1;
 	};
 
 	group.onChildInputDown.add(this.onDown, this);
@@ -447,7 +470,7 @@ menuState.prototype = {
 	},
 	create: function () {
 		'use strict';
-		var background = this.game.add.image(0, 0, 'background');
+		this.game.add.image(0, 0, 'background');
 
 		var title = this.game.add.sprite(this.world.centerX, this.world.centerY/2-20, 'title');
 		title.anchor.setTo(0.5, 0.5);
@@ -667,17 +690,17 @@ playState.prototype = {
 		populationText.setText('Population: ' + this.camp.population);
 		scoreText.setText('Score: ' + this.scores);
 
-		// this.camp.campFoodText.setText('Food: ' + this.camp.food);
-		// this.camp.campWaterText.setText('Water: ' + this.camp.water);
-		// this.camp.campMedicineText.setText('Medicine: ' + this.camp.medicine);
-		// this.camp.campShelterText.setText('Shelter: ' + this.camp.shelter);
-		// this.camp.campStorageText.setText('Capacity: ' + this.camp.storage);
+		this.warehouse.stock[0].setText('Food: ' + this.warehouse.items.num[0]);
+		this.warehouse.stock[1].setText('Water: ' + this.warehouse.items.num[1]);
+		this.warehouse.stock[2].setText('Medicine: ' + this.warehouse.items.num[2]);
+		this.warehouse.stock[3].setText('Shelter: ' + this.warehouse.items.num[3]);
+		this.warehouse.stock[4].setText('Capacity: ' + this.warehouse.items.num[4]);
 
-		// this.warehouse.warehouseFoodText.setText('Food: ' + this.warehouse.food);
-		// this.warehouse.warehouseWaterText.setText('Water: ' + this.warehouse.water);
-		// this.warehouse.warehouseMedicineText.setText('Medicine: ' + this.warehouse.medicine);
-		// this.warehouse.warehouseShelterText.setText('Shelter: ' + this.warehouse.shelter);
-		// this.warehouse.warehouseStorageText.setText('Capacity: ' + this.warehouse.storage);
+		this.camp.stock[0].setText('Food: ' + this.camp.items.num[0]);
+		this.camp.stock[1].setText('Water: ' + this.camp.items.num[1]);
+		this.camp.stock[2].setText('Medicine: ' + this.camp.items.num[2]);
+		this.camp.stock[3].setText('Shelter: ' + this.camp.items.num[3]);
+		this.camp.stock[4].setText('Capacity: ' + this.camp.items.num[4]);
 
 	},
 

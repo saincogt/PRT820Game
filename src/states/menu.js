@@ -15,7 +15,7 @@ menuState.prototype = {
 	},
 	create: function () {
 		'use strict';
-		var background = this.game.add.image(0, 0, 'background');
+		this.game.add.image(0, 0, 'background');
 
 		var title = this.game.add.sprite(this.world.centerX, this.world.centerY/2-20, 'title');
 		title.anchor.setTo(0.5, 0.5);
