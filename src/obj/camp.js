@@ -4,23 +4,24 @@ var CAMP_IMAGE = 'camp';
 
 var Camp = function (game, x, y, frame) {
 	'use strict';
+	Phaser.Sprite.call(this, game, x, y, CAMP_IMAGE, frame);
 
-
-	var itemTextLocation = {
+	var campItems = [];
+	var itemsLocation = {
 		x: game.world.width/20,
-		y: game.world.height/20 + 25
+		y: game.world.height/20 + 200
 	};
 
 	var livesLocation = {
-		x: game.world.width/2 - 100,
-		y: 60
+		x: game.world.width/4 - 140,
+		y: game.world.height*2/5 - 20
 	};
-	var FONTSIZE = 15;
-	var nameList = ['Food', 'Water', 'Medicine', 'Shelter', 'Capacity'];
+	var FONTSIZE = 20;
+	var nameList = ['Food', 'Water', 'Medicine', 'Shelter'];
+	this.onStock = 0;
+	this.storage = 500;
 
 	this.population = 1000;
-
-	Phaser.Sprite.call(this, game, x, y, CAMP_IMAGE, frame);
 	this.name = 'camp';
 	this.anchor.setTo(0.5, 0.5);
 
@@ -33,19 +34,29 @@ var Camp = function (game, x, y, frame) {
 	}
 
 	this.items = {
-		name: ['food', 'water', 'medicine', 'shelter', 'storage'],
-		num: [0, 0, 0, 0, 500],
+		name: ['food', 'water', 'medicine', 'shelter'],
+		num: [0, 0, 0, 0],
 		rate: [100, 90, 20, 40]
 	};
+	var campItemNames = ['population', 'foodItem', 'waterItem', 'medicineItem', 'shelterItem', 'storage'];
 
-	// Show the stock in the camp;
+	// Show the information in the camp;
+	this.campPopulation = game.add.bitmapText(itemsLocation.x - 25, itemsLocation.y - 65, 'lastmileFont', this.population, FONTSIZE);
 	this.stock = [];
 	for (var k = 0; k < this.items.name.length; k++) {
-		this.stock[k] = game.add.bitmapText(itemTextLocation.x, itemTextLocation.y + 20 * k,
-			'lastmileFont', nameList[k] + ': ' + this.items.num[k],
+		this.stock[k] = game.add.bitmapText(itemsLocation.x - 25, itemsLocation.y + 25 + 90 * k,
+			'lastmileFont', this.items.num[k],
 			FONTSIZE);
 	}
+	this.storageText = game.add.bitmapText(itemsLocation.x - 25, itemsLocation.y + 380, 'lastmileFont', '', FONTSIZE);
 
+	// Show items
+	campItems = game.add.group();
+	for (var l = 0; l < 6; l++) {
+		campItems[l] = campItems.create(itemsLocation.x,
+			itemsLocation.y - 100 + 90 * l, campItemNames[l]);
+		campItems[l].anchor.setTo(0.5, 0.5);
+	}
 	// funtions of the camp;
 	this.addPopulation = function () {
 		this.population += 1000;
@@ -60,7 +71,7 @@ var Camp = function (game, x, y, frame) {
 	this.consumeItems = function () {
 		if (lives.countLiving() > 0) {
 			var shortOfItems = false;
-			for (var j = 0; j < this.camp.items.name.length - 1; j++) {
+			for (var j = 0; j < this.camp.items.name.length; j++) {
 				if (this.camp.items.num[j] >= this.camp.items.rate[j] * this.camp.population / 1000) {
 					this.camp.items.num[j] -= this.camp.items.rate[j] * this.camp.population / 1000;
 				} else {
@@ -95,7 +106,14 @@ Camp.prototype = Object.create(Phaser.Sprite.prototype);
 
 Camp.prototype.assets = {
 	camp: 'src/assets/img/camp.png',
-	heartIcon: 'src/assets/img/heart-icon.png'
+	heartIcon: 'src/assets/img/heart-icon.png',
+	population: 'src/assets/img/population.png',
+	foodItem: 'src/assets/img/food.png',
+	waterItem: 'src/assets/img/water.png',
+	medicineItem: 'src/assets/img/medicine.png',
+	shelterItem: 'src/assets/img/shelter.png',
+	storage: 'src/assets/img/storage.png'
+
 };
 
 module.exports = Camp;

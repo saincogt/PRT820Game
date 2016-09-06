@@ -1,29 +1,31 @@
 var Warehouse = function (game, x, y, frame) {
 	'use strict';
+
+	Phaser.Sprite.call(this, game, x, y, 'warehouse', frame);
 	var itemTextLocation = {
 		x: game.world.width*15/20,
 		y: game.world.height/20 + 25
 	};
 
 	var itemBoxLocation = {
-		x: game.world.width*15/20,
-		y: game.world.height*5.5/20
+		x: game.world.width*19/20,
+		y: game.world.height*7/20 - 25
 	};
-	var FONTSIZE = 15;
+	var FONTSIZE = 20;
 
 	var myBox = [];
-	var group;
+	var group = {};
 	var path = game.state.states.play.transports;
 
-	Phaser.Sprite.call(this, game, x, y, 'warehouse', frame);
 
 	this.name = 'warehouse';
 	this.anchor.setTo(0.5, 0.5);
-	var nameList = ['Food', 'Water', 'Medicine', 'Shelter', 'Capacity'];
+	this.scale.setTo(0.62, 0.62);
+	var nameList = ['Food', 'Water', 'Medicine', 'Shelter'];
 	var BOX_VALUE = 100;
 
 	this.items = {
-		name: ['food', 'water', 'medicine', 'shelter', 'storage'],
+		name: ['food', 'water', 'medicine', 'shelter', 'warehousestorage'],
 		num: [700, 700, 300, 300, 2000]
 	};
 
@@ -32,12 +34,15 @@ var Warehouse = function (game, x, y, frame) {
 		num: [300, 300, 200, 200]
 	};
 
+
 	// Show the stock in the warehouse
 	this.stock = [];
 	for (var i = 0; i < this.items.name.length; i++) {
-		this.stock[i] = game.add.bitmapText(itemTextLocation.x, itemTextLocation.y + 20 * i,
-			'lastmileFont', nameList[i] + ': ' + this.items.num[i],
+		this.stock[i] = game.add.bitmapText(itemBoxLocation.x + 20, itemBoxLocation.y + 45 + 90 * i,
+			'lastmileFont', this.items.num[i],
 			FONTSIZE);
+		this.stock[i]._align = 'right';
+		this.stock[i].anchor.setTo(1, 0.5);
 	}
 
 	// Player will have the option to expand the storage by 10 units in every 5 minutes;
@@ -46,83 +51,76 @@ var Warehouse = function (game, x, y, frame) {
 	};
 
 	var addFood = function (currentSprite, endSprite) {
-		if (endSprite.items.food < endSprite.storage) {
-			endSprite.items.food += BOX_VALUE;
-			game.state.states.play.warehouse.items.num[0] -= BOX_VALUE;
+		if (endSprite.items.num[0] < endSprite.storage) {
+			if (game.state.states.play.warehouse.items.num[0] >= BOX_VALUE) {
+				endSprite.items.num[0] += BOX_VALUE;
+				game.state.states.play.warehouse.items.num[0] -= BOX_VALUE;
+				endSprite.nowHave += 1;
+			}
 		}
 	};
 
 	var addWater = function (currentSprite, endSprite) {
-		if (endSprite.items.water < endSprite.storage && endSprite.key !== 'plane') {
-			endSprite.items.water += BOX_VALUE;
-			game.state.states.play.warehouse.items.num[1] -= BOX_VALUE;
+		if (endSprite.items.num[1] < endSprite.storage && endSprite.key !== 'plane') {
+			if (game.state.states.play.warehouse.items.num[1] >= BOX_VALUE) {
+				endSprite.items.num[1] += BOX_VALUE;
+				game.state.states.play.warehouse.items.num[1] -= BOX_VALUE;
+				endSprite.nowHave += 1;
+			}
 		}
 	};
 
 	var addMedicine = function (currentSprite, endSprite) {
-		if (endSprite.items.medicine < endSprite.storage) {
-			endSprite.items.medicine += BOX_VALUE;
-			game.state.states.play.warehouse.items.num[2] -= BOX_VALUE;
+		if (endSprite.items.num[2] < endSprite.storage) {
+			if (game.state.states.play.warehouse.items.num[2] >= BOX_VALUE) {
+				endSprite.items.num[2] += BOX_VALUE;
+				game.state.states.play.warehouse.items.num[2] -= BOX_VALUE;
+				endSprite.nowHave += 1;
+			}
 		}
 	};
 
 	var addShelter = function (currentSprite, endSprite) {
-		if (endSprite.items.shelter < endSprite.storage && endSprite.key !== 'plane') {
-			endSprite.items.shelter += BOX_VALUE;
-			game.state.states.play.warehouse.items.num[3] -= BOX_VALUE;
+		if (endSprite.items.num[3] < endSprite.storage && endSprite.key !== 'plane') {
+			if (game.state.states.play.warehouse.items.num[3] >= BOX_VALUE) {
+				endSprite.items.num[3] += BOX_VALUE;
+				game.state.states.play.warehouse.items.num[3] -= BOX_VALUE;
+				endSprite.nowHave += 1;
+			}
 		}
 	};
 
 	// When stop dragging call other funtion and reset locations;
 	var stopDragFood = function (currentSprite, endSprite) {
-		if (!game.physics.arcade.overlap(currentSprite, endSprite, function(currentSprite, endSprite) {
-			// currentSprite.input.draggable = false;
-			// currentSprite.position.copyFrom(endSprite.position);
-			addFood(currentSprite, endSprite);
-		})) {
-			currentSprite.position.copyFrom(currentSprite.originalPosition);
-		} else {
-			currentSprite.position.copyFrom(currentSprite.originalPosition);
-		}
+		game.physics.arcade.overlap(currentSprite, endSprite, addFood);
+		var tween = game.add.tween(currentSprite);
+		tween.to(currentSprite.originalPosition, 100, 'Linear', true, 0);
 	};
 
 	var stopDragWater = function (currentSprite, endSprite) {
-		if (!game.physics.arcade.overlap(currentSprite, endSprite, function (currentSprite, endSprite) {
-			addWater(currentSprite, endSprite);
-		})) {
-			currentSprite.position.copyFrom(currentSprite.originalPosition);
-		} else {
-			currentSprite.position.copyFrom(currentSprite.originalPosition);
-		}
+		game.physics.arcade.overlap(currentSprite, endSprite, addWater);
+		var tween = game.add.tween(currentSprite);
+		tween.to(currentSprite.originalPosition, 100, 'Linear', true, 0);
 	};
 
 	var stopDragMedicine = function (currentSprite, endSprite) {
-		if (!game.physics.arcade.overlap(currentSprite, endSprite, function (currentSprite, endSprite) {
-			addMedicine(currentSprite, endSprite);
-		})) {
-			currentSprite.position.copyFrom(currentSprite.originalPosition);
-		} else {
-			currentSprite.position.copyFrom(currentSprite.originalPosition);
-		}
+		game.physics.arcade.overlap(currentSprite, endSprite, addMedicine);
+		var tween = game.add.tween(currentSprite);
+		tween.to(currentSprite.originalPosition, 100, 'Linear', true, 0);
 	};
 
 	var stopDragShelter = function (currentSprite, endSprite) {
-		if (!game.physics.arcade.overlap(currentSprite, endSprite, function (currentSprite, endSprite) {
-			addShelter(currentSprite, endSprite);
-		})) {
-			currentSprite.position.copyFrom(currentSprite.originalPosition);
-		} else {
-			currentSprite.position.copyFrom(currentSprite.originalPosition);
-		}
+		game.physics.arcade.overlap(currentSprite, endSprite, addShelter);
+		var tween = game.add.tween(currentSprite);
+		tween.to(currentSprite.originalPosition, 100, 'Linear', true, 0);
 	};
-
 
 	// Show boxes
 	group = game.add.group();
 	group.inputEnableChildren = true;
 	for (var j = 0; j < 4; j++) {
-		myBox[j] = group.create(itemBoxLocation.x + 50 * j,
-			itemBoxLocation.y, this.items.name[j]);
+		myBox[j] = group.create(itemBoxLocation.x,
+			itemBoxLocation.y + 90 * j, this.items.name[j]);
 		myBox[j].alpha = 1;
 		myBox[j].anchor.setTo(0.5, 0.5);
 		myBox[j].input.enableDrag();
@@ -131,6 +129,9 @@ var Warehouse = function (game, x, y, frame) {
 		myBox[j].originalPosition = myBox[j].position.clone();
 		myBox[j].value = BOX_VALUE;
 	}
+
+	group.create(itemBoxLocation.x, itemBoxLocation.y + 360, this.items.name[4]).anchor.setTo(0.5, 0.5);
+
 	myBox[0].events.onDragStop.add(function(currentSprite) {
 		stopDragFood(currentSprite, path.group);
 	}, this);
@@ -144,17 +145,14 @@ var Warehouse = function (game, x, y, frame) {
 		stopDragShelter(currentSprite, path.group);
 	}, this);
 
-	var loadingzone = game.add.image(game.world.width*7/8, game.world.centerY+150, 'loadingzone');
-	loadingzone.anchor.setTo(0.5, 0.5);
-
 	this.onDown = function (sprite) {
 		sprite.tint = 0xffffff;
 		sprite.alpha = 0.8;
 	};
 
-	this.onOver = function (sprite) {
-		sprite.alpha = 1;
-	};
+	// this.onOver = function (sprite) {
+	// 	sprite.alpha = 1;
+	// };
 
 	this.onOut = function (sprite) {
 		sprite.alpha = 1;
@@ -162,25 +160,25 @@ var Warehouse = function (game, x, y, frame) {
 
 	group.onChildInputDown.add(this.onDown, this);
 	group.onChildInputOut.add(this.onOut, this);
-	group.onChildInputOver.add(this.onOver, this);
+	// group.onChildInputOver.add(this.onOver, this);
 
-	var checkOverlap = function (spriteA, spriteB) {
-		var boundA = spriteA.getBounds();
-		var boundB = spriteB.getBounds();
-		return Phaser.Rectangle.intersects(boundA, boundB);
-	};
+	// var checkOverlap = function (spriteA, spriteB) {
+	// 	var boundA = spriteA.getBounds();
+	// 	var boundB = spriteB.getBounds();
+	// 	return Phaser.Rectangle.intersects(boundA, boundB);
+	// };
 
 
 };
 Warehouse.prototype = Object.create(Phaser.Sprite.prototype);
 
 Warehouse.prototype.assets = {
+	warehouse: 'src/assets/img/warehouse.png',
 	water: 'src/assets/img/waterBox.png',
 	food: 'src/assets/img/foodBox.png',
 	medicine: 'src/assets/img/medicineBox.png',
 	shelter: 'src/assets/img/shelterBox.png',
-	warehouse: 'src/assets/img/warehouse-1.png',
-	loadingzone: 'src/assets/img/loadingzone.png'
+	warehousestorage: 'src/assets/img/warehouseStorage.png'
 
 	// "this.load.image\(('[a-z]+'), ('[\-0-9a-zA-Z\.\/]+')\);"
 	// \1: \2
