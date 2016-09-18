@@ -57,6 +57,7 @@ var Camp = function (game, x, y, frame) {
 			itemsLocation.y - 100 + 90 * l, campItemNames[l]);
 		campItems[l].anchor.setTo(0.5, 0.5);
 	}
+
 	// funtions of the camp;
 	this.addPopulation = function () {
 		this.population += 1000;
@@ -74,10 +75,14 @@ var Camp = function (game, x, y, frame) {
 			for (var j = 0; j < this.camp.items.name.length; j++) {
 				if (this.camp.items.num[j] >= this.camp.items.rate[j] * this.camp.population / 1000) {
 					this.camp.items.num[j] -= this.camp.items.rate[j] * this.camp.population / 1000;
+					this.camp.onStock -= this.camp.items.rate[j] * this.camp.population / 1000;
 				} else {
+					this.camp.onStock -= this.camp.items.num[j];
 					this.camp.items.num[j] = 0;
 					shortOfItems = true;
 				}
+
+				console.log(this.camp.onStock);
 			}
 			if (shortOfItems) {
 				this.camp.lossLife();
@@ -93,12 +98,32 @@ var Camp = function (game, x, y, frame) {
 			stillAlive.kill();
 		}
 		if (lives.countLiving() < 1) {
-			// var gameOver = game.add.bitmapText(game.world.width/2, game.world.height/2,'lastmileFont', 'Game Over!\n Your Score: ' + scores, 20);
-			// gameOver.anchor.setTo(0.5, 0.5);
-			// return;
 			game.state.start('over');
 		}
 
+	};
+
+	// this.addItem = function (itemName, quantity) {
+	// 	if(totalItems + quantity < this.storage) {
+	// 		// Add the items;
+	// 		totalItems += quantity;
+	// 	} else {
+	// 		// Fail silently, throw error or whatever you want to do
+	// 	}
+	// };
+
+	this.addItem = function (camp, transport) {
+		for (var i = 0; i < 4; i++) {
+			if (camp.onStock + transport.items.num[i] <= this.storage) {
+				camp.items.num[i] += transport.items.num[i];
+				camp.onStock += transport.items.num[i];
+				game.state.states.play.scores += transport.items.num[i];
+			} else {
+				camp.items.num[i] += this.storage - camp.onStock;
+				game.state.states.play.scores += this.storage - camp.onStock;
+				camp.onStock  = this.storage;
+			}
+		}
 	};
 };
 

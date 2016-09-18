@@ -20,7 +20,7 @@ var Warehouse = function (game, x, y, frame) {
 
 	this.name = 'warehouse';
 	this.anchor.setTo(0.5, 0.5);
-	this.scale.setTo(0.62, 0.62);
+	this.scale.setTo(0.63, 0.63);
 	var nameList = ['Food', 'Water', 'Medicine', 'Shelter'];
 	var BOX_VALUE = 100;
 
@@ -33,6 +33,7 @@ var Warehouse = function (game, x, y, frame) {
 		name: ['food', 'water', 'medicine', 'shelter'],
 		num: [300, 300, 200, 200]
 	};
+	this.nowHave = 2000;
 
 
 	// Show the stock in the warehouse
@@ -51,41 +52,45 @@ var Warehouse = function (game, x, y, frame) {
 	};
 
 	var addFood = function (currentSprite, endSprite) {
-		if (endSprite.items.num[0] < endSprite.storage) {
+		if (endSprite.nowHave < endSprite.storage) {
 			if (game.state.states.play.warehouse.items.num[0] >= BOX_VALUE) {
 				endSprite.items.num[0] += BOX_VALUE;
 				game.state.states.play.warehouse.items.num[0] -= BOX_VALUE;
-				endSprite.nowHave += 1;
+				game.state.states.play.warehouse.nowHave -= BOX_VALUE;
+				endSprite.nowHave += 100;
 			}
 		}
 	};
 
 	var addWater = function (currentSprite, endSprite) {
-		if (endSprite.items.num[1] < endSprite.storage && endSprite.key !== 'plane') {
+		if (endSprite.nowHave < endSprite.storage && endSprite.key !== 'plane') {
 			if (game.state.states.play.warehouse.items.num[1] >= BOX_VALUE) {
 				endSprite.items.num[1] += BOX_VALUE;
 				game.state.states.play.warehouse.items.num[1] -= BOX_VALUE;
-				endSprite.nowHave += 1;
+				game.state.states.play.warehouse.nowHave -= BOX_VALUE;
+				endSprite.nowHave += 100;
 			}
 		}
 	};
 
 	var addMedicine = function (currentSprite, endSprite) {
-		if (endSprite.items.num[2] < endSprite.storage) {
+		if (endSprite.nowHave < endSprite.storage) {
 			if (game.state.states.play.warehouse.items.num[2] >= BOX_VALUE) {
 				endSprite.items.num[2] += BOX_VALUE;
 				game.state.states.play.warehouse.items.num[2] -= BOX_VALUE;
-				endSprite.nowHave += 1;
+				game.state.states.play.warehouse.nowHave -= BOX_VALUE;
+				endSprite.nowHave += 100;
 			}
 		}
 	};
 
 	var addShelter = function (currentSprite, endSprite) {
-		if (endSprite.items.num[3] < endSprite.storage && endSprite.key !== 'plane') {
+		if (endSprite.nowHave < endSprite.storage && endSprite.key !== 'plane') {
 			if (game.state.states.play.warehouse.items.num[3] >= BOX_VALUE) {
 				endSprite.items.num[3] += BOX_VALUE;
 				game.state.states.play.warehouse.items.num[3] -= BOX_VALUE;
-				endSprite.nowHave += 1;
+				game.state.states.play.warehouse.nowHave -= BOX_VALUE;
+				endSprite.nowHave += 100;
 			}
 		}
 	};
@@ -168,6 +173,17 @@ var Warehouse = function (game, x, y, frame) {
 	// 	return Phaser.Rectangle.intersects(boundA, boundB);
 	// };
 
+	this.refillStock = function () {
+		for (var i = 0; i < 4; i++) {
+			if (this.warehouse.nowHave + this.warehouse.ship.num[i] <= this.warehouse.items.num[4]) {
+				this.warehouse.items.num[i] += this.warehouse.ship.num[i];
+				this.warehouse.nowHave += this.warehouse.ship.num[i];
+			} else {
+				this.warehouse.items.num[i] += this.warehouse.items.num[4] - this.warehouse.nowHave;
+				this.warehouse.nowHave = this.warehouse.items.num[4];
+			}
+		}
+	};
 
 };
 Warehouse.prototype = Object.create(Phaser.Sprite.prototype);

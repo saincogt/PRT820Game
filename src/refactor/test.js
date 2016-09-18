@@ -1,16 +1,15 @@
-var myCamp = function () {
-	// body...
+var camp = function () {
+	this.food = 0;
+	this.water = 0;
+
+	this.items = [];
+
+	this.items.push(this.food);
+	this.items.push(this.water);
+
 };
 
-myCamp.prototype.assets = {
-	one: '1',
-	two: '2',
-	three: '3'
-};
-
-var example = new myCamp();
-
-for (var i in example.assets) {
-	console.log(i);
-	console.log(example.assets[i]);
-}
+var myCamp = new camp();
+myCamp.food = 100;
+console.log(myCamp.food);
+console.log(myCamp.items);

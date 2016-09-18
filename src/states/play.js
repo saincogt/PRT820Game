@@ -85,8 +85,9 @@ playState.prototype = {
 		// Time events: run the addPopulation function in every 1 minute;
 		// For testing purpose, the time is set to 1 seconds;
 
-		this.time.events.loop(Phaser.Timer.SECOND * 100, this.camp.consumeItems, this);
-		this.time.events.loop(Phaser.Timer.SECOND * 100, this.addPopulation, this);
+		this.time.events.loop(Phaser.Timer.SECOND * 20, this.camp.consumeItems, this);
+		this.time.events.loop(Phaser.Timer.SECOND * 120, this.addPopulation, this);
+		this.time.events.loop(Phaser.Timer.SECOND * 20, this.warehouse.refillStock, this);
 		// this.time.events.loop(Phaser.Timer.SECOND * 2, this.camp.consumeItems, this);
 
 		// console.log(this);
@@ -139,7 +140,7 @@ playState.prototype = {
 		this.camp.campPopulation.setText(this.camp.population);
 
 		for (var i = 0; i < 3; i++) {
-			this.transports.stock[i].setText(this.transports.options[i].nowHave + '/' + this.transports.options[i].storage/100);
+			this.transports.stock[i].setText(this.transports.options[i].nowHave / 100 + '/' + this.transports.options[i].storage/100);
 		}
 
 	},
@@ -147,6 +148,7 @@ playState.prototype = {
 	addPopulation: function () {
 		'use strict';
 		this.camp.population += 1000;
+		this.scores += 1000;
 		// this.add.tween(scoreText).to({alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
 	},
 

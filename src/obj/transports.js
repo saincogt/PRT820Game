@@ -4,10 +4,14 @@ var TWEEN_PLANE = 500;
 var TWEEN_TRUCK = 2000;
 var TWEEN_PORTER = 3000;
 var PLANE_WAIT = 40000;
+
+/**
+* @param {phaser.Game} game The phaser game instance
+**/
 var Transports = function (game, x, y, frame) {
 	'use strict';
 	Phaser.Sprite.call(this, game, x, y, frame);
-	var path = game.state.states.play.camp;
+	var gameCamp = game.state.states.play.camp;
 
 	var optionLocation = {
 		x: game.world.width * 6 / 8 - 70,
@@ -51,10 +55,11 @@ var Transports = function (game, x, y, frame) {
 	}
 
 	this.PlaneOnComplete = function () {
-		path.items.num[0] += this.options[0].items.num[0];
-		path.items.num[2] += this.options[0].items.num[2];
-		this.options[0].items.num[0] = 0;
-		this.options[0].items.num[2] = 0;
+		// extract to camp
+		gameCamp.addItem(gameCamp, this.options[0]);
+
+		// stay
+		this.clearStock(this.options[0]);
 		this.options[0].position.copyFrom(this.options[0].originalPostion);
 		// this.goPlane.inputEnabled = true;
 		this.goPlane.visible = true;
@@ -62,23 +67,8 @@ var Transports = function (game, x, y, frame) {
 	};
 
 	this.ConvoyOnComplete = function () {
-
-		// for (var i = 0; i < 4; i++) {
-		// 	if (path.onStock < path.storage) {
-		// 		path.items.num[i] += this.options[1].items.num[i];
-		// 		this.options[1].items.num[i] = 0;
-		// 		path.onStock += 100;
-		// 		console.log(path.onStock, path.storage);
-		// 	}
-		// }
-		path.items.num[0] += this.options[1].items.num[0];
-		path.items.num[1] += this.options[1].items.num[1];
-		path.items.num[2] += this.options[1].items.num[2];
-		path.items.num[3] += this.options[1].items.num[3];
-		this.options[1].items.num[0] = 0;
-		this.options[1].items.num[1] = 0;
-		this.options[1].items.num[2] = 0;
-		this.options[1].items.num[3] = 0;
+		gameCamp.addItem(gameCamp, this.options[1]);
+		this.clearStock(this.options[1]);
 		this.options[1].position.copyFrom(this.options[1].originalPostion);
 		// this.goConvoy.inputEnabled = true;
 		this.goConvoy.visible = true;
@@ -86,15 +76,9 @@ var Transports = function (game, x, y, frame) {
 	};
 
 	this.PortersOnComplete = function () {
-		path.population += this.options[2].population;
-		path.items.num[0] += this.options[2].items.num[0];
-		path.items.num[1] += this.options[2].items.num[1];
-		path.items.num[2] += this.options[2].items.num[2];
-		path.items.num[3] += this.options[2].items.num[3];
-		this.options[2].items.num[0] = 0;
-		this.options[2].items.num[1] = 0;
-		this.options[2].items.num[2] = 0;
-		this.options[2].items.num[3] = 0;
+		gameCamp.population += this.options[2].population;
+		gameCamp.addItem(gameCamp, this.options[2]);
+		this.clearStock(this.options[2]);
 		this.options[2].position.copyFrom(this.options[2].originalPostion);
 		// this.goPorters.inputEnabled = true;
 		this.goPorters.visible = true;
@@ -111,11 +95,11 @@ var Transports = function (game, x, y, frame) {
 		tween.to({x: [game.world.width/2, campPostion.x],
 			y: [game.world.centerY-200, campPostion.y]}, TWEEN_PLANE,
 			Phaser.Easing.Quadratic.InOut, true, 0);
-		var PlaneOnComplete = function() {
-			this.PlaneOnComplete(this);
-		}.bind(this);
+		// var PlaneOnComplete = function() {
+		// 	this.PlaneOnComplete(this);
+		// }.bind(this);
 
-		tween.onComplete.add(PlaneOnComplete, this);
+		tween.onComplete.add(this.PlaneOnComplete, this);
 	};
 
 	this.sendConvoy = function () {
@@ -127,7 +111,7 @@ var Transports = function (game, x, y, frame) {
 		var tween = game.add.tween(this.options[1]);
 		tween.to({x: campPostion.x, y: campPostion.y}, TWEEN_TRUCK, 'Linear', true, 0);
 		// var ConvoyOnComplete = function () {
-		// 	this.transports.ConvoyOnComplete(this);
+		// 	this.ConvoyOnComplete(this);
 		// }.bind(this);
 		tween.onComplete.add(this.ConvoyOnComplete, this);
 	};
@@ -141,7 +125,7 @@ var Transports = function (game, x, y, frame) {
 		var tween = game.add.tween(this.options[2]).to({x: campPostion.x, y: campPostion.y}, TWEEN_PORTER, 'Linear', true, 0);
 
 		// var PortersOnComplete = function () {
-		// 	this.transports.PortersOnComplete(this);
+		// 	this.PortersOnComplete(this);
 		// }.bind(this);
 		tween.onComplete.add(this.PortersOnComplete, this);
 	};
@@ -158,6 +142,12 @@ var Transports = function (game, x, y, frame) {
 
 	this.goPorters = game.add.button(this.options[2].position.x + 90, this.options[2].position.y, 'goButton', this.sendPorters, this);
 	this.goPorters.anchor.setTo(0.5, 0.5);
+
+	this.clearStock = function (transport) {
+		for (var i = 0; i < 4; i++) {
+			transport.items.num[i] = 0;
+		}
+	};
 
 };
 

@@ -74,6 +74,7 @@ var Camp = function (game, x, y, frame) {
 			itemsLocation.y - 100 + 90 * l, campItemNames[l]);
 		campItems[l].anchor.setTo(0.5, 0.5);
 	}
+
 	// funtions of the camp;
 	this.addPopulation = function () {
 		this.population += 1000;
@@ -91,10 +92,14 @@ var Camp = function (game, x, y, frame) {
 			for (var j = 0; j < this.camp.items.name.length; j++) {
 				if (this.camp.items.num[j] >= this.camp.items.rate[j] * this.camp.population / 1000) {
 					this.camp.items.num[j] -= this.camp.items.rate[j] * this.camp.population / 1000;
+					this.camp.onStock -= this.camp.items.rate[j] * this.camp.population / 1000;
 				} else {
+					this.camp.onStock -= this.camp.items.num[j];
 					this.camp.items.num[j] = 0;
 					shortOfItems = true;
 				}
+
+				console.log(this.camp.onStock);
 			}
 			if (shortOfItems) {
 				this.camp.lossLife();
@@ -110,12 +115,32 @@ var Camp = function (game, x, y, frame) {
 			stillAlive.kill();
 		}
 		if (lives.countLiving() < 1) {
-			// var gameOver = game.add.bitmapText(game.world.width/2, game.world.height/2,'lastmileFont', 'Game Over!\n Your Score: ' + scores, 20);
-			// gameOver.anchor.setTo(0.5, 0.5);
-			// return;
 			game.state.start('over');
 		}
 
+	};
+
+	// this.addItem = function (itemName, quantity) {
+	// 	if(totalItems + quantity < this.storage) {
+	// 		// Add the items;
+	// 		totalItems += quantity;
+	// 	} else {
+	// 		// Fail silently, throw error or whatever you want to do
+	// 	}
+	// };
+
+	this.addItem = function (camp, transport) {
+		for (var i = 0; i < 4; i++) {
+			if (camp.onStock + transport.items.num[i] <= this.storage) {
+				camp.items.num[i] += transport.items.num[i];
+				camp.onStock += transport.items.num[i];
+				game.state.states.play.scores += transport.items.num[i];
+			} else {
+				camp.items.num[i] += this.storage - camp.onStock;
+				game.state.states.play.scores += this.storage - camp.onStock;
+				camp.onStock  = this.storage;
+			}
+		}
 	};
 };
 
@@ -142,10 +167,14 @@ var TWEEN_PLANE = 500;
 var TWEEN_TRUCK = 2000;
 var TWEEN_PORTER = 3000;
 var PLANE_WAIT = 40000;
+
+/**
+* @param {phaser.Game} game The phaser game instance
+**/
 var Transports = function (game, x, y, frame) {
 	'use strict';
 	Phaser.Sprite.call(this, game, x, y, frame);
-	var path = game.state.states.play.camp;
+	var gameCamp = game.state.states.play.camp;
 
 	var optionLocation = {
 		x: game.world.width * 6 / 8 - 70,
@@ -189,10 +218,11 @@ var Transports = function (game, x, y, frame) {
 	}
 
 	this.PlaneOnComplete = function () {
-		path.items.num[0] += this.options[0].items.num[0];
-		path.items.num[2] += this.options[0].items.num[2];
-		this.options[0].items.num[0] = 0;
-		this.options[0].items.num[2] = 0;
+		// extract to camp
+		gameCamp.addItem(gameCamp, this.options[0]);
+
+		// stay
+		this.clearStock(this.options[0]);
 		this.options[0].position.copyFrom(this.options[0].originalPostion);
 		// this.goPlane.inputEnabled = true;
 		this.goPlane.visible = true;
@@ -200,23 +230,8 @@ var Transports = function (game, x, y, frame) {
 	};
 
 	this.ConvoyOnComplete = function () {
-
-		// for (var i = 0; i < 4; i++) {
-		// 	if (path.onStock < path.storage) {
-		// 		path.items.num[i] += this.options[1].items.num[i];
-		// 		this.options[1].items.num[i] = 0;
-		// 		path.onStock += 100;
-		// 		console.log(path.onStock, path.storage);
-		// 	}
-		// }
-		path.items.num[0] += this.options[1].items.num[0];
-		path.items.num[1] += this.options[1].items.num[1];
-		path.items.num[2] += this.options[1].items.num[2];
-		path.items.num[3] += this.options[1].items.num[3];
-		this.options[1].items.num[0] = 0;
-		this.options[1].items.num[1] = 0;
-		this.options[1].items.num[2] = 0;
-		this.options[1].items.num[3] = 0;
+		gameCamp.addItem(gameCamp, this.options[1]);
+		this.clearStock(this.options[1]);
 		this.options[1].position.copyFrom(this.options[1].originalPostion);
 		// this.goConvoy.inputEnabled = true;
 		this.goConvoy.visible = true;
@@ -224,15 +239,9 @@ var Transports = function (game, x, y, frame) {
 	};
 
 	this.PortersOnComplete = function () {
-		path.population += this.options[2].population;
-		path.items.num[0] += this.options[2].items.num[0];
-		path.items.num[1] += this.options[2].items.num[1];
-		path.items.num[2] += this.options[2].items.num[2];
-		path.items.num[3] += this.options[2].items.num[3];
-		this.options[2].items.num[0] = 0;
-		this.options[2].items.num[1] = 0;
-		this.options[2].items.num[2] = 0;
-		this.options[2].items.num[3] = 0;
+		gameCamp.population += this.options[2].population;
+		gameCamp.addItem(gameCamp, this.options[2]);
+		this.clearStock(this.options[2]);
 		this.options[2].position.copyFrom(this.options[2].originalPostion);
 		// this.goPorters.inputEnabled = true;
 		this.goPorters.visible = true;
@@ -249,11 +258,11 @@ var Transports = function (game, x, y, frame) {
 		tween.to({x: [game.world.width/2, campPostion.x],
 			y: [game.world.centerY-200, campPostion.y]}, TWEEN_PLANE,
 			Phaser.Easing.Quadratic.InOut, true, 0);
-		var PlaneOnComplete = function() {
-			this.PlaneOnComplete(this);
-		}.bind(this);
+		// var PlaneOnComplete = function() {
+		// 	this.PlaneOnComplete(this);
+		// }.bind(this);
 
-		tween.onComplete.add(PlaneOnComplete, this);
+		tween.onComplete.add(this.PlaneOnComplete, this);
 	};
 
 	this.sendConvoy = function () {
@@ -265,7 +274,7 @@ var Transports = function (game, x, y, frame) {
 		var tween = game.add.tween(this.options[1]);
 		tween.to({x: campPostion.x, y: campPostion.y}, TWEEN_TRUCK, 'Linear', true, 0);
 		// var ConvoyOnComplete = function () {
-		// 	this.transports.ConvoyOnComplete(this);
+		// 	this.ConvoyOnComplete(this);
 		// }.bind(this);
 		tween.onComplete.add(this.ConvoyOnComplete, this);
 	};
@@ -279,7 +288,7 @@ var Transports = function (game, x, y, frame) {
 		var tween = game.add.tween(this.options[2]).to({x: campPostion.x, y: campPostion.y}, TWEEN_PORTER, 'Linear', true, 0);
 
 		// var PortersOnComplete = function () {
-		// 	this.transports.PortersOnComplete(this);
+		// 	this.PortersOnComplete(this);
 		// }.bind(this);
 		tween.onComplete.add(this.PortersOnComplete, this);
 	};
@@ -296,6 +305,12 @@ var Transports = function (game, x, y, frame) {
 
 	this.goPorters = game.add.button(this.options[2].position.x + 90, this.options[2].position.y, 'goButton', this.sendPorters, this);
 	this.goPorters.anchor.setTo(0.5, 0.5);
+
+	this.clearStock = function (transport) {
+		for (var i = 0; i < 4; i++) {
+			transport.items.num[i] = 0;
+		}
+	};
 
 };
 
@@ -332,7 +347,7 @@ var Warehouse = function (game, x, y, frame) {
 
 	this.name = 'warehouse';
 	this.anchor.setTo(0.5, 0.5);
-	this.scale.setTo(0.62, 0.62);
+	this.scale.setTo(0.63, 0.63);
 	var nameList = ['Food', 'Water', 'Medicine', 'Shelter'];
 	var BOX_VALUE = 100;
 
@@ -345,6 +360,7 @@ var Warehouse = function (game, x, y, frame) {
 		name: ['food', 'water', 'medicine', 'shelter'],
 		num: [300, 300, 200, 200]
 	};
+	this.nowHave = 2000;
 
 
 	// Show the stock in the warehouse
@@ -363,41 +379,45 @@ var Warehouse = function (game, x, y, frame) {
 	};
 
 	var addFood = function (currentSprite, endSprite) {
-		if (endSprite.items.num[0] < endSprite.storage) {
+		if (endSprite.nowHave < endSprite.storage) {
 			if (game.state.states.play.warehouse.items.num[0] >= BOX_VALUE) {
 				endSprite.items.num[0] += BOX_VALUE;
 				game.state.states.play.warehouse.items.num[0] -= BOX_VALUE;
-				endSprite.nowHave += 1;
+				game.state.states.play.warehouse.nowHave -= BOX_VALUE;
+				endSprite.nowHave += 100;
 			}
 		}
 	};
 
 	var addWater = function (currentSprite, endSprite) {
-		if (endSprite.items.num[1] < endSprite.storage && endSprite.key !== 'plane') {
+		if (endSprite.nowHave < endSprite.storage && endSprite.key !== 'plane') {
 			if (game.state.states.play.warehouse.items.num[1] >= BOX_VALUE) {
 				endSprite.items.num[1] += BOX_VALUE;
 				game.state.states.play.warehouse.items.num[1] -= BOX_VALUE;
-				endSprite.nowHave += 1;
+				game.state.states.play.warehouse.nowHave -= BOX_VALUE;
+				endSprite.nowHave += 100;
 			}
 		}
 	};
 
 	var addMedicine = function (currentSprite, endSprite) {
-		if (endSprite.items.num[2] < endSprite.storage) {
+		if (endSprite.nowHave < endSprite.storage) {
 			if (game.state.states.play.warehouse.items.num[2] >= BOX_VALUE) {
 				endSprite.items.num[2] += BOX_VALUE;
 				game.state.states.play.warehouse.items.num[2] -= BOX_VALUE;
-				endSprite.nowHave += 1;
+				game.state.states.play.warehouse.nowHave -= BOX_VALUE;
+				endSprite.nowHave += 100;
 			}
 		}
 	};
 
 	var addShelter = function (currentSprite, endSprite) {
-		if (endSprite.items.num[3] < endSprite.storage && endSprite.key !== 'plane') {
+		if (endSprite.nowHave < endSprite.storage && endSprite.key !== 'plane') {
 			if (game.state.states.play.warehouse.items.num[3] >= BOX_VALUE) {
 				endSprite.items.num[3] += BOX_VALUE;
 				game.state.states.play.warehouse.items.num[3] -= BOX_VALUE;
-				endSprite.nowHave += 1;
+				game.state.states.play.warehouse.nowHave -= BOX_VALUE;
+				endSprite.nowHave += 100;
 			}
 		}
 	};
@@ -480,6 +500,17 @@ var Warehouse = function (game, x, y, frame) {
 	// 	return Phaser.Rectangle.intersects(boundA, boundB);
 	// };
 
+	this.refillStock = function () {
+		for (var i = 0; i < 4; i++) {
+			if (this.warehouse.nowHave + this.warehouse.ship.num[i] <= this.warehouse.items.num[4]) {
+				this.warehouse.items.num[i] += this.warehouse.ship.num[i];
+				this.warehouse.nowHave += this.warehouse.ship.num[i];
+			} else {
+				this.warehouse.items.num[i] += this.warehouse.items.num[4] - this.warehouse.nowHave;
+				this.warehouse.nowHave = this.warehouse.items.num[4];
+			}
+		}
+	};
 
 };
 Warehouse.prototype = Object.create(Phaser.Sprite.prototype);
@@ -712,8 +743,9 @@ playState.prototype = {
 		// Time events: run the addPopulation function in every 1 minute;
 		// For testing purpose, the time is set to 1 seconds;
 
-		this.time.events.loop(Phaser.Timer.SECOND * 100, this.camp.consumeItems, this);
-		this.time.events.loop(Phaser.Timer.SECOND * 100, this.addPopulation, this);
+		this.time.events.loop(Phaser.Timer.SECOND * 20, this.camp.consumeItems, this);
+		this.time.events.loop(Phaser.Timer.SECOND * 120, this.addPopulation, this);
+		this.time.events.loop(Phaser.Timer.SECOND * 20, this.warehouse.refillStock, this);
 		// this.time.events.loop(Phaser.Timer.SECOND * 2, this.camp.consumeItems, this);
 
 		// console.log(this);
@@ -766,7 +798,7 @@ playState.prototype = {
 		this.camp.campPopulation.setText(this.camp.population);
 
 		for (var i = 0; i < 3; i++) {
-			this.transports.stock[i].setText(this.transports.options[i].nowHave + '/' + this.transports.options[i].storage/100);
+			this.transports.stock[i].setText(this.transports.options[i].nowHave / 100 + '/' + this.transports.options[i].storage/100);
 		}
 
 	},
@@ -774,6 +806,7 @@ playState.prototype = {
 	addPopulation: function () {
 		'use strict';
 		this.camp.population += 1000;
+		this.scores += 1000;
 		// this.add.tween(scoreText).to({alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
 	},
 
