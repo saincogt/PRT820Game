@@ -72,10 +72,10 @@ playState.prototype = {
 		pause.anchor.setTo(0.5, 0.5);
 		// pause.scale.setTo(0.05, 0.05);
 
-		this.upCamp = this.add.button(this.world.width*3.3/20-30, this.world.height*1/20+10, 'upgrade', this.upgradeCamp, this);
+		this.upCamp = this.add.button(this.world.width/20, this.world.height*7/20 + 410, 'upgrade', this.upgradeCamp, this);
 		this.upCamp.anchor.setTo(0.5, 0.5);
 
-		this.upWare = this.add.button(this.world.width*4.2/20-30, this.world.height*1/20+10, 'upgrade', this.upgradeWare, this);
+		this.upWare = this.add.button(this.world.width*19/20, this.world.height*7/20 + 415, 'upgrade', this.upgradeWare, this);
 		this.upWare.anchor.setTo(0.5, 0.5);
 
 		this.scores = 0;
